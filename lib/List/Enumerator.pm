@@ -2,23 +2,13 @@ package List::Enumerator;
 use Moose;
 use Sub::Exporter -setup => { exports => [ "E" ] };
 
+use List::Enumerator::Array;
+
 our $VERSION = 0.01;
 
-with "List::Enumerator::Role";
-
-has "next" => (is => 'ro', isa => 'CodeRef');
-
 sub E {
-	__PACKAGE__->array(@_);
-}
-
-sub array {
-	my ($self, @args) = @_;
-	my $i = 0;
-	$self->new(next => sub {
-		die "StopIteration" if $i >= @args;
-		$args[$i++];
-	});
+	my (@args) = @_;
+	List::Enumerator::Array->new(array => \@args);
 }
 
 
@@ -33,6 +23,8 @@ List::Enumerator -
 =head1 SYNOPSIS
 
   use List::Enumerator;
+  List::Enumerator::Array;
+  List::Enumerator::Code;
 
 =head1 DESCRIPTION
 
