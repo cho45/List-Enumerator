@@ -22,6 +22,8 @@ sub each {
 	wantarray ? @ret : $self;
 }
 
+*to_a = \&each;
+
 sub rewind {
 	die "Not implemented.";
 }

@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use List::Enumerator qw/E/;
 use Data::Dumper;
@@ -30,3 +30,4 @@ is_deeply $result, [1, 2, 3];
 
 
 is_deeply [ E(1, 2, 3)->each ], [1, 2, 3];
+is_deeply [ E(1, 2, 3)->to_a ], [1, 2, 3];
