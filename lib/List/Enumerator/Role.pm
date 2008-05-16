@@ -11,7 +11,12 @@ sub each {
 			local $_ = $self->next;
 			$block->($_);
 		}
-	}; if (Exception::Class->caught("StopIteration") ) { }
+	}; if (Exception::Class->caught("StopIteration") ) { } else
+	{
+		my $e = Exception::Class->caught();
+		ref $e ? $e->rethrow : die $e;
+	}
+
 	$self;
 }
 
@@ -20,6 +25,8 @@ sub rewind {
 }
 
 sub stop {
+	my ($self) = @_;
+	eval { $self->rewind };
 	StopIteration->throw;
 }
 
