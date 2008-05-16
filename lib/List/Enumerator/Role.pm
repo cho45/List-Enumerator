@@ -3,7 +3,6 @@ use Moose::Role;
 use Exception::Class ( "StopIteration" );
 
 requires "next";
-requires "rewind";
 
 sub each {
 	my ($self, $block) = @_;
@@ -12,11 +11,13 @@ sub each {
 			local $_ = $self->next;
 			$block->($_);
 		}
-	}; if (Exception::Class->caught("StopIteration") ) {
-	}
+	}; if (Exception::Class->caught("StopIteration") ) { }
 	$self;
 }
 
+sub rewind {
+	die "Not implemented.";
+}
 
 sub stop {
 	StopIteration->throw;
