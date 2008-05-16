@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use List::Enumerator qw/E/;
 use Data::Dumper;
@@ -28,3 +28,5 @@ $array_enum->each(sub {
 });
 is_deeply $result, [1, 2, 3];
 
+
+is_deeply [ E(1, 2, 3)->each ], [1, 2, 3];

@@ -6,10 +6,12 @@ requires "next";
 
 sub each {
 	my ($self, $block) = @_;
+	my @ret;
 	eval {
 		while (1) {
 			local $_ = $self->next;
-			$block->($_);
+			push @ret, $_;
+			$block->($_) if $block;
 		}
 	}; if (Exception::Class->caught("StopIteration") ) { } else
 	{
@@ -17,7 +19,7 @@ sub each {
 		ref $e ? $e->rethrow : die $e;
 	}
 
-	$self;
+	wantarray ? @ret : $self;
 }
 
 sub rewind {
