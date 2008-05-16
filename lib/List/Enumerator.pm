@@ -1,8 +1,27 @@
 package List::Enumerator;
+use Moose;
+use Sub::Exporter -setup => { exports => [ "E" ] };
 
-use strict;
-use warnings;
-our $VERSION = '0.01';
+our $VERSION = 0.01;
+
+with "List::Enumerator::Role";
+
+has "next" => (is => 'ro', isa => 'CodeRef');
+
+sub E {
+	__PACKAGE__->array(@_);
+}
+
+sub array {
+	my ($self, @args) = @_;
+	my $i = 0;
+	$self->new(next => sub {
+		die "StopIteration" if $i >= @args;
+		$args[$i++];
+	});
+}
+
+
 
 1;
 __END__
