@@ -144,5 +144,43 @@ sub test_with_index : Test(1) {
 	is_deeply $result, [qw/a 0 b 1 c 2/];
 }
 
+sub test_select : Test(1) {
+}
+
+#sub test_reduce : Test(1) {
+#	is E(1, 2, 3)->reduce(sub { $a + $b }), 6;
+#	is_deeply E(1, 2, 3)->zip(qw/a b c/)->reduce(sub {
+#		my ($r, $n, $c) = @_;
+#		$r->{$c} = $n;
+#	}, {}), {
+#		a => 1,
+#		b => 2,
+#		c => 3,
+#	};
+#}
+
+sub test_find : Test {
+}
+
+sub test_max : Test {
+}
+
+sub test_min : Test {
+}
+
+sub test_chain : Test {
+}
+
+sub test_act_as_arrayref : Test(2) {
+	my $list;
+
+	$list = E(1, 2, 3);
+	is $list->[0], 1;
+
+	$list = E(1, 2, 3)->cycle;
+	is $list->[3], 1;
+}
+
+
 __PACKAGE__->runtests;
 
