@@ -100,7 +100,7 @@ sub zip {
 		}
 	);
 
-	wantarray? $ret->to_list : $ret;
+	wantarray? $ret->map(sub { [ @_ ] })->to_list : $ret;
 }
 
 sub with_index {

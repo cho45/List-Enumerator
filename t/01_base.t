@@ -106,7 +106,7 @@ is_deeply [ E(1)->countup->take_while(sub { $_ * $_ <= 9 }) ], [1, 2, 3];
 
 # zip
 
-is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/])->map(sub { [ @_ ] }) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
+is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/]) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
 
 # with_index
 
