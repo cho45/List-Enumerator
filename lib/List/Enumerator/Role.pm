@@ -74,14 +74,43 @@ sub some {
 *any = \&some;
 
 sub zip {
+	my ($self, @others) = @_;
+	my $elements = [
+		map {
+			List::Enumerator::E($_);
+		}
+		$self, @others
+	];
+
+	my $ret = List::Enumerator::Sub->new(
+		next => sub {
+			my @ret = ();
+			for (@$elements) {
+				push @ret, $_->next;
+			}
+			@ret;
+		},
+		rewind => sub {
+			$elements = [
+				map {
+					List::Enumerator::E($_);
+				}
+				$self, @others
+			];
+		}
+	);
+
+	wantarray? $ret->to_list : $ret;
 }
 
 sub with_index {
+	my ($self, $start) = @_;
+	$self->zip(List::Enumerator::E($start)->countup);
 }
 
 sub countup {
 	my ($self, $lim) = @_;
-	my $start = $self->next || 0;
+	my $start = eval { $self->next } || 0;
 	my $i = $start;
 	List::Enumerator::Sub->new({
 		next => sub {
@@ -90,7 +119,7 @@ sub countup {
 		},
 		rewind => sub {
 			$self->rewind;
-			$i = $self->next || 0;
+			$i = eval { $self->next } || 0;
 		}
 	});
 }
@@ -115,6 +144,9 @@ sub cycle {
 					$cache[++$i % @cache];
 				});
 				$ret = $this->next;
+			} else {
+				my $e = Exception::Class->caught();
+				ref $e ? $e->rethrow : die $e if $e;
 			}
 			$ret;
 		},
@@ -129,8 +161,9 @@ sub map {
 	my ($self, $block) = @_;
 	my $ret = List::Enumerator::Sub->new({
 		next => sub {
-			local $_ = $self->next;
-			$block->($_);
+			my @item = $self->next;
+			local $_ = $item[0];
+			$block->(@item);
 		},
 		rewind => sub {
 			$self->rewind;
@@ -144,14 +177,14 @@ sub each {
 	my @ret;
 	eval {
 		while (1) {
-			local $_ = $self->next;
+			my @item = $self->next;
+			local $_ = $item[0];
 			push @ret, $_;
-			$block->($_) if $block;
+			$block->(@item) if $block;
 		}
-	}; if (Exception::Class->caught("StopIteration") ) { } else
-	{
+	}; if (Exception::Class->caught("StopIteration") ) { } else {
 		my $e = Exception::Class->caught();
-		ref $e ? $e->rethrow : die $e;
+		ref $e ? $e->rethrow : die $e if $e;
 	}
 
 	wantarray? @ret : $self;

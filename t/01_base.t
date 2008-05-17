@@ -1,12 +1,10 @@
 use strict;
 use Test::More qw/no_plan/;
 
+use lib "lib";
 use List::Enumerator qw/E/;
 use List::Enumerator::Array;
 use List::Enumerator::Sub;
-use Data::Dumper;
-
-sub p ($) { warn Dumper shift }
 
 my $result;
 
@@ -86,11 +84,13 @@ is $list->next, 3;
 
 
 # countup / countup / to
-$list = E(1)->countup;
+$list = E()->countup;
+is $list->next, 0;
 is $list->next, 1;
 is $list->next, 2;
 is $list->next, 3;
-is $list->rewind->next, 1;
+is $list->rewind->next, 0;
+is $list->next, 1;
 is $list->next, 2;
 is $list->next, 3;
 
@@ -103,4 +103,19 @@ is_deeply [ E(1)->countup->take(5) ], [1, 2, 3, 4, 5];
 
 is_deeply [ E(1)->countup->take(sub { $_ <= 5 }) ], [1, 2, 3, 4, 5];
 is_deeply [ E(1)->countup->take_while(sub { $_ * $_ <= 9 }) ], [1, 2, 3];
+
+# zip
+
+is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/])->map(sub { [ @_ ] }) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
+
+# with_index
+
+
+$result = [];
+E("a", "b", "c")->with_index->each(sub {
+	my ($item, $index) = @_;
+	push @$result, $item, $index;
+});
+is_deeply $result, [qw/a 0 b 1 c 2/];
+
 1;

@@ -9,13 +9,16 @@ our $VERSION = 0.01;
 
 sub E {
 	my (@args) = @_;
-	if (ref $args[0] eq "HASH") {
+	if (ref($args[0]) eq "HASH") {
 		List::Enumerator::Sub->new($args[0]);
+	} elsif (ref($args[0]) eq "ARRAY") {
+		List::Enumerator::Array->new(array => $args[0]);
+	} elsif (ref($args[0]) =~ /^List::Enumerator/) {
+		$args[0];
 	} else {
 		List::Enumerator::Array->new(array => \@args);
 	}
 }
-
 
 
 1;
