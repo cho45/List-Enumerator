@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 6;
+use Test::More qw/no_plan/;
 
 use List::Enumerator qw/E/;
 use List::Enumerator::Array;
@@ -37,10 +37,17 @@ is_deeply [ E(1, 2, 3)->to_a ], [1, 2, 3];
 
 my $list = List::Enumerator::Sub->new(
 	next => sub {
-		rand;
+		156
 	},
 	rewind => sub {
 	}
 );
 
-ok $list->next;
+is $list->next, 156;
+
+my $list = E({
+	next => sub {
+		156
+	}
+});
+is $list->next, 156;

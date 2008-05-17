@@ -3,12 +3,17 @@ use Moose;
 use Sub::Exporter -setup => { exports => [ "E" ] };
 
 use List::Enumerator::Array;
+use List::Enumerator::Sub;
 
 our $VERSION = 0.01;
 
 sub E {
 	my (@args) = @_;
-	List::Enumerator::Array->new(array => \@args);
+	if (ref $args[0] eq "HASH") {
+		List::Enumerator::Sub->new($args[0]);
+	} else {
+		List::Enumerator::Array->new(array => \@args);
+	}
 }
 
 
