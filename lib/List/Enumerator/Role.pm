@@ -38,6 +38,35 @@ sub min {
 *min_by = \&min;
 
 sub chain {
+	my ($self, @others) = @_;
+	my ($elements, $current);
+	my $ret = List::Enumerator::Sub->new(
+		next => sub {
+			my $ret;
+			eval {
+				$ret = $current->next;
+			}; if (Exception::Class->caught("StopIteration") ) {
+				$current = $elements->next;
+				$ret = $current->next;
+			} else {
+				my $e = Exception::Class->caught();
+				ref $e ? $e->rethrow : die $e if $e;
+			}
+			$ret;
+		},
+		rewind => sub {
+			$elements = List::Enumerator::E([
+				map {
+					List::Enumerator::E($_);
+				}
+				$self, @others
+			]);
+
+			$current = $elements->next;
+		}
+	)->rewind;
+
+	wantarray? $ret->to_list : $ret;
 }
 
 sub take {

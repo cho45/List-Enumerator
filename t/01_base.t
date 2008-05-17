@@ -182,6 +182,7 @@ sub test_min : Test {
 }
 
 sub test_chain : Test {
+	is_deeply E(1, 2, 3)->chain([4, 5, 6])->to_a , [1, 2, 3, 4, 5, 6];
 }
 
 sub test_act_as_arrayref : Test(2) {
