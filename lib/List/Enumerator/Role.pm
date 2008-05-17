@@ -10,6 +10,9 @@ sub map {
 		next => sub {
 			local $_ = $self->next;
 			$block->($_);
+		},
+		rewind => sub {
+			$self->rewind;
 		}
 	});
 	wantarray? $ret->to_a : $ret;
