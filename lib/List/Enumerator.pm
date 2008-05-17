@@ -33,7 +33,15 @@ List::Enumerator -
 
 =head1 DESCRIPTION
 
-List::Enumerator is
+List::Enumerator is list library like Enumerator of Ruby.
+
+=head2 Concept
+
+=over
+=item * Lazy evaluation for inifinate list (ex. cycle)
+=item * Read the Context
+=item * Applicatable (implemented as Moose::Role).
+=back
 
 =head1 AUTHOR
 
