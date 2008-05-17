@@ -4,6 +4,33 @@ use Exception::Class ( "StopIteration" );
 
 requires "next";
 
+sub cycle {
+	my ($self) = @_;
+	my @cache = ();
+	List::Enumerator::Sub->new({
+		next => sub {
+			my ($this) = @_;
+
+			my $ret;
+			eval {
+				$ret = $self->next;
+				push @cache, $ret;
+			}; if (Exception::Class->caught("StopIteration") ) {
+				my $i = -1;
+				$this->next(sub {
+					$cache[++$i % @cache];
+				});
+				$ret = $this->next;
+			}
+			$ret;
+		},
+		rewind => sub {
+			$self->rewind;
+			@cache = ();
+		}
+	});
+}
+
 sub map {
 	my ($self, $block) = @_;
 	my $ret = List::Enumerator::Sub->new({

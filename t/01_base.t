@@ -69,3 +69,18 @@ is_deeply E(1, 2, 3)->to_a, [1, 2, 3];
 is_deeply [ E(1, 2, 3)->to_a ], [ [1, 2, 3] ];
 
 
+## --- TODO : 分割
+
+
+$list = E(1, 2, 3)->cycle;
+is $list->next, 1;
+is $list->next, 2;
+is $list->next, 3;
+is $list->next, 1;
+is $list->next, 2;
+is $list->next, 3;
+#is $list->next, 1;
+#is $list->next, 2;
+#is $list->next, 3;
+
+1;

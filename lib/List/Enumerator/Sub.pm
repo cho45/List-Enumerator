@@ -14,18 +14,29 @@ sub BUILD {
 }
 
 sub next {
-	my ($self) = @_;
+	my ($self, $new) = @_;
 
-	$self->next_sub->();
+	if ($new) {
+		$self->next_sub($new);
+		$self;
+	} else {
+		local $_ = $self;
+		$self->next_sub->($self);
+	}
 }
 
 sub rewind {
-	my ($self) = @_;
+	my ($self, $new) = @_;
 
-	if ($self->rewind_sub) {
-		$self->rewind_sub->();
+	if ($new) {
+		$self->rewind_subb($new);
+		$self;
 	} else {
-		die "Not Implemented";
+		if ($self->rewind_sub) {
+			$self->rewind_sub->();
+		} else {
+			die "Not Implemented";
+		}
 	}
 }
 
