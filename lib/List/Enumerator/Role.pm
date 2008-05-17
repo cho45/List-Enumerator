@@ -4,6 +4,17 @@ use Exception::Class ( "StopIteration" );
 
 requires "next";
 
+sub map {
+	my ($self, $block) = @_;
+	my $ret = List::Enumerator::Sub->new({
+		next => sub {
+			local $_ = $self->next;
+			$block->($_);
+		}
+	});
+	wantarray? $ret->to_a : $ret;
+}
+
 sub each {
 	my ($self, $block) = @_;
 	my @ret;
@@ -19,7 +30,7 @@ sub each {
 		ref $e ? $e->rethrow : die $e;
 	}
 
-	wantarray ? @ret : $self;
+	wantarray? @ret : $self;
 }
 
 *to_a = \&each;

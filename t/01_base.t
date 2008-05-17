@@ -51,3 +51,8 @@ my $list = E({
 	}
 });
 is $list->next, 156;
+
+
+is_deeply [ E(1, 2, 3)->map(sub { $_ * $_ }) ], [1, 4, 9];
+
+
