@@ -62,6 +62,38 @@ sub take {
 *take_while = \&take;
 
 sub drop {
+	my ($self, $arg) = @_;
+	my $ret;
+	if (ref $arg eq "CODE") {
+		my $first;
+		$ret = List::Enumerator::Sub->new(
+			next => sub {
+				my $ret = $first || $self->next;
+				$first = undef if $first;
+				$ret;
+			},
+			rewind => sub {
+				$self->rewind;
+				do {
+					$first = $self->next;
+				} while ($arg->(local $_ = $first));
+			}
+		);
+		$ret->rewind;
+	} else {
+		$ret = List::Enumerator::Sub->new(
+			next => sub {
+				$self->next;
+			},
+			rewind => sub {
+				my $i = $arg;
+				$self->rewind;
+				$self->next while ($i--);
+			}
+		);
+		$ret->rewind;
+	}
+	wantarray? $ret->to_list : $ret;
 }
 *drop_while = \&drop_while;
 

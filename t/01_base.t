@@ -98,14 +98,22 @@ is_deeply E(1)->to(5)->to_a, [1, 2, 3, 4, 5];
 is_deeply E(5)->to(5)->to_a, [5];
 
 # take
+is_deeply E(1, 2, 3, 4, 5)->take(3)->to_a, [1, 2, 3];
+
 is_deeply [ E(1, 2, 3)->cycle->take(5) ], [1, 2, 3, 1, 2];
 is_deeply [ E(1)->countup->take(5) ], [1, 2, 3, 4, 5];
 
 is_deeply [ E(1)->countup->take(sub { $_ <= 5 }) ], [1, 2, 3, 4, 5];
 is_deeply [ E(1)->countup->take_while(sub { $_ * $_ <= 9 }) ], [1, 2, 3];
 
-# zip
+# drop
+is_deeply [ E(1, 2, 3)->drop(1) ], [2, 3];
+is_deeply [ E()->countup->drop(3)->take(5) ], [3, 4, 5, 6, 7];
+is_deeply [ E()->countup->drop(sub { $_ * $_ <= 9 })->take(5) ], [4, 5, 6, 7, 8];
+is_deeply [ E()->countup->drop(sub { $_ * $_ <= 9 })->take(5)->drop(3) ], [7, 8];
 
+
+# zip
 is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/]) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
 
 # with_index
