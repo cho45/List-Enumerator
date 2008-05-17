@@ -8,6 +8,19 @@ use List::MoreUtils;
 requires "next";
 
 sub select {
+	my ($self, $block) = @_;
+	List::Enumerator::Sub->new(
+		next => sub {
+			local $_;
+			do {
+				$_ = $self->next;
+			} while ($block->($_));
+			$_;
+		},
+		rewind => sub {
+			$self->rewind;
+		}
+	)->rewind;
 }
 *find_all = \&select;
 
@@ -35,6 +48,15 @@ sub reduce {
 *inject = \&reduce;
 
 sub find {
+	my ($self, $block) = @_;
+	my $ret;
+	$self->each(sub {
+		if ($block->($self)) {
+			$ret = $_;
+			$self->stop;
+		}
+	});
+	$ret;
 }
 
 sub first {

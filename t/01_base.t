@@ -150,11 +150,17 @@ sub test_with_index : Test(1) {
 	is_deeply $result, [qw/a 0 b 1 c 2/];
 }
 
-sub test_select : Test(1) {
+sub test_select : Test(2) {
+	is_deeply E(1)->to(10)->select(sub {
+		$_ % 2;
+	})->to_a, [2, 4, 6, 8, 10];
+
+	is_deeply E(1)->countup->select(sub {
+		$_ % 2;
+	})->take(4)->to_a, [2, 4, 6, 8];
 }
 
-sub test_reduce : Test(3) {
-
+sub test_reduce : Test(2) {
 	is E(1, 2, 3)->reduce(sub { 
 		$a + $b
 	}), 6;
@@ -171,6 +177,7 @@ sub test_reduce : Test(3) {
 }
 
 sub test_find : Test {
+	is E(1, 2, 3)->find(sub { $_ > 1 }), 2;
 }
 
 sub test_max : Test(2) {
