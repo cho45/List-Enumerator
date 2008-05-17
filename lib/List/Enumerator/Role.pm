@@ -15,7 +15,7 @@ sub map {
 			$self->rewind;
 		}
 	});
-	wantarray? $ret->to_a : $ret;
+	wantarray? $ret->to_list : $ret;
 }
 
 sub each {
@@ -36,11 +36,16 @@ sub each {
 	wantarray? @ret : $self;
 }
 
-*to_a = \&each;
+*to_list = \&each;
+
+sub to_a {
+	my ($self) = @_;
+	[ $self->each ];
+}
 
 sub dup {
 	my ($self) = @_;
-	List::Enumerator::Array->new(array => [ $self->to_a ]);
+	List::Enumerator::Array->new(array => $self->to_a);
 }
 
 sub rewind {
