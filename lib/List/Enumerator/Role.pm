@@ -40,9 +40,9 @@ sub take {
 			rewind => sub {
 				$self->rewind;
 			}
-		);
+		)->rewind;
 	} else {
-		my $i = 0;
+		my $i;
 		$ret = List::Enumerator::Sub->new(
 			next => sub {
 				if ($i++ < $arg) {
@@ -52,10 +52,10 @@ sub take {
 				}
 			},
 			rewind => sub {
-				$i = 0;
 				$self->rewind;
+				$i = 0;
 			}
-		);
+		)->rewind;
 	}
 	wantarray? $ret->to_list : $ret;
 }
@@ -78,8 +78,7 @@ sub drop {
 					$first = $self->next;
 				} while ($arg->(local $_ = $first));
 			}
-		);
-		$ret->rewind;
+		)->rewind;
 	} else {
 		$ret = List::Enumerator::Sub->new(
 			next => sub {
@@ -90,8 +89,7 @@ sub drop {
 				$self->rewind;
 				$self->next while ($i--);
 			}
-		);
-		$ret->rewind;
+		)->rewind;
 	}
 	wantarray? $ret->to_list : $ret;
 }
@@ -107,13 +105,7 @@ sub some {
 
 sub zip {
 	my ($self, @others) = @_;
-	my $elements = [
-		map {
-			List::Enumerator::E($_);
-		}
-		$self, @others
-	];
-
+	my $elements;
 	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			my @ret = ();
@@ -130,7 +122,7 @@ sub zip {
 				$self, @others
 			];
 		}
-	);
+	)->rewind;
 
 	wantarray? $ret->map(sub { [ @_ ] })->to_list : $ret;
 }
@@ -142,8 +134,7 @@ sub with_index {
 
 sub countup {
 	my ($self, $lim) = @_;
-	my $start = eval { $self->next } || 0;
-	my $i = $start;
+	my $i;
 	List::Enumerator::Sub->new({
 		next => sub {
 			($lim && $i > $lim) && StopIteration->throw;
@@ -153,7 +144,7 @@ sub countup {
 			$self->rewind;
 			$i = eval { $self->next } || 0;
 		}
-	});
+	})->rewind;
 }
 *countup_to = \&countup;
 *to = \&countup;
@@ -161,7 +152,7 @@ sub countup {
 
 sub cycle {
 	my ($self) = @_;
-	my @cache = ();
+	my @cache;
 	List::Enumerator::Sub->new({
 		next => sub {
 			my ($this) = @_;
@@ -186,7 +177,7 @@ sub cycle {
 			$self->rewind;
 			@cache = ();
 		}
-	});
+	})->rewind;
 }
 
 sub map {
