@@ -1,5 +1,7 @@
 package List::Enumerator::Array;
 use Moose;
+use overload
+	'@{}' => \&to_a;
 
 with "List::Enumerator::Role";
 
@@ -19,6 +21,11 @@ sub rewind {
 	my ($self) = @_;
 
 	$self->index(0);
+}
+
+sub to_a {
+	my ($self) = @_;
+	$self->array;
 }
 
 

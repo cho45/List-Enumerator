@@ -1,5 +1,7 @@
 package List::Enumerator::Sub;
 use Moose;
+use overload
+	'@{}' => \&getarray;
 
 with "List::Enumerator::Role";
 
@@ -41,6 +43,28 @@ sub rewind {
 	}
 }
 
+sub getarray {
+	my ($self) = @_;
+	my @temp;
+	tie @temp, __PACKAGE__, $self;
+	\@temp;
+}
+
+sub TIEARRAY {
+	my ($class, $arg) = @_;
+	bless $arg, $class;
+}
+
+sub FETCHSIZE {
+	0;
+}
+
+sub FETCH { #TODO orz orz orz
+	my ($self, $index) = @_;
+	$self->rewind;
+	$self->next while ($index--);
+	$self->next;
+}
 
 __PACKAGE__->meta->make_immutable;
 

@@ -2,6 +2,9 @@ package List::Enumerator::Role;
 use Moose::Role;
 use Exception::Class ( "StopIteration" );
 
+use List::Util;
+use List::MoreUtils;
+
 requires "next";
 
 sub select {
@@ -9,6 +12,7 @@ sub select {
 *find_all = \&select;
 
 sub reduce {
+	
 }
 *inject = \&reduce;
 
@@ -16,10 +20,16 @@ sub find {
 }
 
 sub max {
+	my ($self, $block) = @_;
+	List::Util::max $self->to_list;
 }
+*max_by = \&max;
 
 sub min {
+	my ($self, $block) = @_;
+	List::Util::min $self->to_list;
 }
+*min_by = \&min;
 
 sub chain {
 }
