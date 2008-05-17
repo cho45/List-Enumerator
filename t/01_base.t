@@ -79,8 +79,8 @@ is $list->next, 3;
 is $list->next, 1;
 is $list->next, 2;
 is $list->next, 3;
-#is $list->next, 1;
-#is $list->next, 2;
-#is $list->next, 3;
+is $list->next, 1;
+is $list->next, 2;
+is $list->next, 3;
 
 1;
