@@ -130,8 +130,14 @@ sub test_drop : Test(4) {
 }
 
 
-sub test_zip : Test(1) {
+sub test_zip : Test(2) {
 	is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/]) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
+
+	my $result = [];
+	E(1, 2, 3)->zip([qw/a b c/])->each(sub {
+		push @$result, \@_;
+	});
+	is_deeply $result, [ [1, "a"], [2, "b"], [3, "c"] ];
 }
 
 
@@ -147,17 +153,24 @@ sub test_with_index : Test(1) {
 sub test_select : Test(1) {
 }
 
-#sub test_reduce : Test(1) {
-#	is E(1, 2, 3)->reduce(sub { $a + $b }), 6;
-#	is_deeply E(1, 2, 3)->zip(qw/a b c/)->reduce(sub {
-#		my ($r, $n, $c) = @_;
-#		$r->{$c} = $n;
-#	}, {}), {
-#		a => 1,
-#		b => 2,
-#		c => 3,
-#	};
-#}
+sub test_reduce : Test(3) {
+
+	is E(1, 2, 3)->reduce(sub { 
+		my ($r, $a) = @_;
+		$r + $a
+	}), 6;
+
+	is_deeply E(1, 2, 3)->zip([qw/a b c/])->reduce(sub {
+		my ($r, $n, $c) = @_;
+
+		$r->{$c} = $n;
+		$r;
+	}, {}), {
+		a => 1,
+		b => 2,
+		c => 3,
+	};
+}
 
 sub test_find : Test {
 }

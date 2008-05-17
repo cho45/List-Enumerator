@@ -12,7 +12,13 @@ sub select {
 *find_all = \&select;
 
 sub reduce {
-	
+	my ($self, $block, @init) = @_;
+
+	my @rval = @init ? @init : $self->next;
+	$self->each(sub{
+		@rval = $block->(@rval, @_);
+	});
+	wantarray? @rval : $rval[0];
 }
 *inject = \&reduce;
 
