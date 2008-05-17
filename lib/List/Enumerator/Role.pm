@@ -25,6 +25,39 @@ sub chain {
 }
 
 sub take {
+	my ($self, $arg) = @_;
+	my $ret;
+	if (ref $arg eq "CODE") {
+		$ret = List::Enumerator::Sub->new(
+			next => sub {
+				local $_ = $self->next;
+				if ($arg->($_)) {
+					$_;
+				} else {
+					StopIteration->throw;
+				}
+			},
+			rewind => sub {
+				$self->rewind;
+			}
+		);
+	} else {
+		my $i = 0;
+		$ret = List::Enumerator::Sub->new(
+			next => sub {
+				if ($i++ < $arg) {
+					$self->next;
+				} else {
+					StopIteration->throw;
+				}
+			},
+			rewind => sub {
+				$i = 0;
+				$self->rewind;
+			}
+		);
+	}
+	wantarray? $ret->to_list : $ret;
 }
 *take_while = \&take;
 
@@ -47,7 +80,22 @@ sub with_index {
 }
 
 sub countup {
+	my ($self, $lim) = @_;
+	my $start = $self->next || 0;
+	my $i = $start;
+	List::Enumerator::Sub->new({
+		next => sub {
+			($lim && $i > $lim) && StopIteration->throw;
+			$i++;
+		},
+		rewind => sub {
+			$self->rewind;
+			$i = $self->next || 0;
+		}
+	});
 }
+*countup_to = \&countup;
+*to = \&countup;
 
 
 sub cycle {

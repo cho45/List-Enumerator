@@ -34,6 +34,7 @@ sub rewind {
 	} else {
 		if ($self->rewind_sub) {
 			$self->rewind_sub->();
+			$self;
 		} else {
 			die "Not Implemented";
 		}

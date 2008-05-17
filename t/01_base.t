@@ -72,6 +72,7 @@ is_deeply [ E(1, 2, 3)->to_a ], [ [1, 2, 3] ];
 ## --- TODO : 分割
 
 
+# cycle
 $list = E(1, 2, 3)->cycle;
 is $list->next, 1;
 is $list->next, 2;
@@ -83,4 +84,23 @@ is $list->next, 1;
 is $list->next, 2;
 is $list->next, 3;
 
+
+# countup / countup / to
+$list = E(1)->countup;
+is $list->next, 1;
+is $list->next, 2;
+is $list->next, 3;
+is $list->rewind->next, 1;
+is $list->next, 2;
+is $list->next, 3;
+
+is_deeply E(1)->to(5)->to_a, [1, 2, 3, 4, 5];
+is_deeply E(5)->to(5)->to_a, [5];
+
+# take
+is_deeply [ E(1, 2, 3)->cycle->take(5) ], [1, 2, 3, 1, 2];
+is_deeply [ E(1)->countup->take(5) ], [1, 2, 3, 4, 5];
+
+is_deeply [ E(1)->countup->take(sub { $_ <= 5 }) ], [1, 2, 3, 4, 5];
+is_deeply [ E(1)->countup->take_while(sub { $_ * $_ <= 9 }) ], [1, 2, 3];
 1;
