@@ -1,3 +1,4 @@
+.gitignore
 Changes
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -14,11 +15,17 @@ inc/Test/Base.pm
 inc/Test/Base/Filter.pm
 inc/Test/Builder.pm
 inc/Test/Builder/Module.pm
+inc/Test/Class.pm
 inc/Test/More.pm
 lib/List/Enumerator.pm
+lib/List/Enumerator/Array.pm
+lib/List/Enumerator/Role.pm
+lib/List/Enumerator/Sub.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 Rakefile
 README
 t/00_compile.t
+t/01_base.t
+t/02_fizzbuzz.t
