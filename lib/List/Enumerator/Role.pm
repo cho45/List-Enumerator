@@ -4,6 +4,52 @@ use Exception::Class ( "StopIteration" );
 
 requires "next";
 
+sub select {
+}
+*find_all = \&select;
+
+sub reduce {
+}
+*inject = \&reduce;
+
+sub find {
+}
+
+sub max {
+}
+
+sub min {
+}
+
+sub chain {
+}
+
+sub take {
+}
+*take_while = \&take;
+
+sub drop {
+}
+*drop_while = \&drop_while;
+
+sub every {
+}
+*all = \&every;
+
+sub some {
+}
+*any = \&some;
+
+sub zip {
+}
+
+sub with_index {
+}
+
+sub countup {
+}
+
+
 sub cycle {
 	my ($self) = @_;
 	my @cache = ();
