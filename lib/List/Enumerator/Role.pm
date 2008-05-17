@@ -12,30 +12,80 @@ sub select {
 *find_all = \&select;
 
 sub reduce {
-	my ($self, $block, @init) = @_;
+	my ($self, $result, $block) = @_;
+	no strict 'refs';
 
-	my @rval = @init ? @init : $self->next;
-	$self->each(sub{
-		@rval = $block->(@rval, @_);
+	if (@_ == 2) {
+		$block  = $result;
+		$result = undef;
+	};
+	
+	my $caller = caller;
+	local *{$caller."::a"} = \my $a;
+	local *{$caller."::b"} = \my $b;
+
+	$a = $result || $self->next;
+	$self->each(sub {
+		$b = $_;
+		$a = $block->($a, $b);
 	});
-	wantarray? @rval : $rval[0];
+
+	$a;
 }
 *inject = \&reduce;
 
 sub find {
 }
 
+sub first {
+	my ($self) = @_;
+	$self->rewind;
+	my $ret = $self->next;
+	$self->rewind;
+	$ret;
+}
+
+sub last {
+	my ($self) = @_;
+	my $ret = $self->to_a;
+	$ret->[@$ret - 1];
+}
+
 sub max {
 	my ($self, $block) = @_;
 	List::Util::max $self->to_list;
 }
-*max_by = \&max;
+
+sub max_by {
+	my ($self, $block) = @_;
+	$self->sort_by($block)->last;
+}
 
 sub min {
 	my ($self, $block) = @_;
 	List::Util::min $self->to_list;
 }
-*min_by = \&min;
+
+sub min_by {
+	my ($self, $block) = @_;
+	$self->sort_by($block)->first;
+}
+
+sub sort_by {
+	my ($self, $block) = @_;
+	List::Enumerator::E(
+		map {
+			$_->[0];
+		}
+		sort {
+			$a->[1] <=> $b->[1];
+		}
+		map {
+			[$_, $block->($_)];
+		}
+		$self->to_list
+	);
+}
 
 sub chain {
 	my ($self, @others) = @_;
@@ -153,11 +203,11 @@ sub zip {
 	my $elements;
 	my $ret = List::Enumerator::Sub->new(
 		next => sub {
-			my @ret = ();
+			my $ret = [];
 			for (@$elements) {
-				push @ret, $_->next;
+				push @$ret, $_->next;
 			}
-			@ret;
+			$ret;
 		},
 		rewind => sub {
 			$elements = [
@@ -169,7 +219,7 @@ sub zip {
 		}
 	)->rewind;
 
-	wantarray? $ret->map(sub { [ @_ ] })->to_list : $ret;
+	wantarray? $ret->to_list : $ret;
 }
 
 sub with_index {
@@ -229,9 +279,8 @@ sub map {
 	my ($self, $block) = @_;
 	my $ret = List::Enumerator::Sub->new({
 		next => sub {
-			my @item = $self->next;
-			local $_ = $item[0];
-			$block->(@item);
+			local $_ = $self->next;
+			$block->($_);
 		},
 		rewind => sub {
 			$self->rewind;
@@ -245,10 +294,9 @@ sub each {
 	my @ret;
 	eval {
 		while (1) {
-			my @item = $self->next;
-			local $_ = $item[0];
+			local $_ = $self->next;
 			push @ret, $_;
-			$block->(@item) if $block;
+			$block->($_) if $block;
 		}
 	}; if (Exception::Class->caught("StopIteration") ) { } else {
 		my $e = Exception::Class->caught();

@@ -135,7 +135,7 @@ sub test_zip : Test(2) {
 
 	my $result = [];
 	E(1, 2, 3)->zip([qw/a b c/])->each(sub {
-		push @$result, \@_;
+		push @$result, $_;
 	});
 	is_deeply $result, [ [1, "a"], [2, "b"], [3, "c"] ];
 }
@@ -144,7 +144,7 @@ sub test_zip : Test(2) {
 sub test_with_index : Test(1) {
 	my $result = [];
 	E("a", "b", "c")->with_index->each(sub {
-		my ($item, $index) = @_;
+		my ($item, $index) = @$_;
 		push @$result, $item, $index;
 	});
 	is_deeply $result, [qw/a 0 b 1 c 2/];
@@ -156,16 +156,14 @@ sub test_select : Test(1) {
 sub test_reduce : Test(3) {
 
 	is E(1, 2, 3)->reduce(sub { 
-		my ($r, $a) = @_;
-		$r + $a
+		$a + $b
 	}), 6;
 
-	is_deeply E(1, 2, 3)->zip([qw/a b c/])->reduce(sub {
-		my ($r, $n, $c) = @_;
-
-		$r->{$c} = $n;
-		$r;
-	}, {}), {
+	is_deeply E(1, 2, 3)->zip([qw/a b c/])->reduce({}, sub {
+		my ($n, $c) = @$b;
+		$a->{$b->[1]} = $n;
+		$a;
+	}), {
 		a => 1,
 		b => 2,
 		c => 3,
@@ -175,10 +173,14 @@ sub test_reduce : Test(3) {
 sub test_find : Test {
 }
 
-sub test_max : Test {
+sub test_max : Test(2) {
+	is E(1, 2, 3)->max, 3;
+	is E(1, 2, 3)->max_by(sub { 100 - $_ }), 1;
 }
 
-sub test_min : Test {
+sub test_min : Test(2) {
+	is E(1, 2, 3)->min, 1;
+	is E(1, 2, 3)->min_by(sub { 100 - $_ }), 3;
 }
 
 sub test_chain : Test {
