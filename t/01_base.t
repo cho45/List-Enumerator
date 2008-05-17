@@ -57,4 +57,12 @@ $list = E(1, 2, 3)->map(sub { $_ * $_ });
 is_deeply [ $list->to_a ], [1, 4, 9];
 is_deeply [ $list->to_a ], [1, 4, 9];
 
+$list = E(1, 2, 3);
+is_deeply [ $list->map(sub { $_ * $_ }) ], [1, 4, 9];
+is_deeply [ $list->map(sub { $_ * $_ }) ], [1, 4, 9];
+
+$list = E(1, 2, 3);
+
+is $list->dup->next, 1;
+is $list->next, 1;
 

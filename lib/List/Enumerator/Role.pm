@@ -38,6 +38,11 @@ sub each {
 
 *to_a = \&each;
 
+sub dup {
+	my ($self) = @_;
+	List::Enumerator::Array->new(array => [ $self->to_a ]);
+}
+
 sub rewind {
 	die "Not implemented.";
 }
