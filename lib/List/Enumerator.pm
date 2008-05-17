@@ -24,7 +24,7 @@ List::Enumerator -
 
   use List::Enumerator;
   List::Enumerator::Array;
-  List::Enumerator::Code;
+  List::Enumerator::Sub;
 
 =head1 DESCRIPTION
 
