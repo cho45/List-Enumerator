@@ -21,6 +21,7 @@ sub rewind {
 	my ($self) = @_;
 
 	$self->index(0);
+	$self;
 }
 
 sub to_a {

@@ -129,7 +129,7 @@ sub chain {
 		rewind => sub {
 			$elements = List::Enumerator::E([
 				map {
-					List::Enumerator::E($_);
+					List::Enumerator::E($_)->rewind;
 				}
 				$self, @others
 			]);
@@ -157,7 +157,7 @@ sub take {
 			rewind => sub {
 				$self->rewind;
 			}
-		)->rewind;
+		);
 	} else {
 		my $i;
 		$ret = List::Enumerator::Sub->new(
@@ -172,7 +172,7 @@ sub take {
 				$self->rewind;
 				$i = 0;
 			}
-		)->rewind;
+		);
 	}
 	wantarray? $ret->to_list : $ret;
 }
