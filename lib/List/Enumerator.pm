@@ -52,23 +52,64 @@ List::Enumerator is list library like Enumerator of Ruby.
 
 List::Enumerator::E is interface wrapper for generating List::Enumerator::Array or List::Enumerator::Sub.
 
+Most methods (except what returns always infinite list) consider caller context. ex:
+
+  E(1, 2, 3, 4, 5)->take(3);     #=> new List::Enumerator::Sub
+  [ E(1, 2, 3, 4, 5)->take(3) ]; #=> [1, 2, 3]
+
 =over
 
 =item E(list), E([arrayref])
 
+Returns List::Enumerator::Array.
+
 =item E({ next => sub {}, rewind => sub {} })
 
+Returns List::Enumerator::Sub. ex:
+
+  use List::Enumerator qw/E/;
+
+  sub fibonacci {
+      my ($p, $i);
+      E(0, 1)->chain(E({
+          next => sub {
+              my $ret = $p + $i;
+              $p = $i;
+              $i = $ret;
+              $ret;
+          },
+          rewind => sub {
+              ($p, $i) = (0, 1);
+          }
+      }))->rewind;
+  }
+
+  [ fibonacci->take(10) ];           #=> [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
+  [ fibonacci->drop(10)->take(10) ]; #=> [ 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181 ];
+
+
 =back
+
 
 =head2 Concept
 
 =over
 
 =item * Lazy evaluation for infinite list (ex. cycle)
+
+=item * Method chain
+
 =item * Read the Context
+
 =item * Applicable (implemented as Moose::Role).
 
 =back
+
+
+=head1 DEVELOPMENT
+
+This module is developing at github L<http://github.com/cho45/list-enumerator/tree/master>.
+
 
 =head1 AUTHOR
 
