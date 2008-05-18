@@ -8,7 +8,7 @@ use Data::Dumper;
 sub p ($) { warn Dumper shift }
 
 sub fibonacci {
-	my ($p, $i) = (0, 1);
+	my ($p, $i);
 	E(0, 1)->chain(E({
 		next => sub {
 			my $ret = $p + $i;
@@ -19,7 +19,7 @@ sub fibonacci {
 		rewind => sub {
 			($p, $i) = (0, 1);
 		}
-	}));
+	}))->rewind;
 }
 
 is_deeply [ fibonacci->take(10) ], [
