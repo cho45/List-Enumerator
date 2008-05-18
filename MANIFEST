@@ -29,3 +29,4 @@ README
 t/00_compile.t
 t/01_base.t
 t/02_fizzbuzz.t
+t/03_fibonacci.t
