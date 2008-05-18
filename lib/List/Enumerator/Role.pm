@@ -32,16 +32,19 @@ sub reduce {
 		$block  = $result;
 		$result = undef;
 	};
-	
+
 	my $caller = caller;
 	local *{$caller."::a"} = \my $a;
 	local *{$caller."::b"} = \my $b;
 
-	$a = $result || $self->next;
-	$self->each(sub {
+	my @list = $self->to_list;
+	unshift @list, $result if defined $result;
+
+	$a = shift @list;
+	for (@list) {
 		$b = $_;
 		$a = $block->($a, $b);
-	});
+	};
 
 	$a;
 }
@@ -157,7 +160,7 @@ sub take {
 			rewind => sub {
 				$self->rewind;
 			}
-		);
+		)->rewind;
 	} else {
 		my $i;
 		$ret = List::Enumerator::Sub->new(
@@ -172,7 +175,7 @@ sub take {
 				$self->rewind;
 				$i = 0;
 			}
-		);
+		)->rewind;
 	}
 	wantarray? $ret->to_list : $ret;
 }
@@ -313,6 +316,8 @@ sub map {
 
 sub each {
 	my ($self, $block) = @_;
+	$self->rewind;
+
 	my @ret;
 	eval {
 		while (1) {

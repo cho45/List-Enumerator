@@ -10,7 +10,7 @@ use List::Enumerator::Array;
 use List::Enumerator::Sub;
 
 
-sub test_each : Test(4) {
+sub test_each : Test(6) {
 	my $result = [];
 
 	E(1, 2, 3)->each(sub {
@@ -31,6 +31,11 @@ sub test_each : Test(4) {
 	});
 	is_deeply $result, [1, 2, 3];
 	is_deeply [ E(1, 2, 3)->each ], [1, 2, 3];
+
+	my $list = E(1, 2, 3);
+	$list->next;
+	is_deeply $list->to_a, [1, 2, 3];
+	is_deeply [ $list->each], [1, 2, 3];
 }
 
 

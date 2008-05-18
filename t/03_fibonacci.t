@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use lib "lib";
 use List::Enumerator qw/E/;
@@ -34,9 +34,21 @@ is_deeply [ $fib->take(10) ], [
 ];
 
 is_deeply [ $fib->take(10) ], [
+	0, 1, 1, 2, 3, 5, 8, 13, 21, 34
+];
+
+is $fib->[10], 55;
+
+is_deeply [ $fib->drop(10)->take(10) ], [
 	55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181
 ];
 
-is_deeply [ $fib->rewind->take(10) ], [
-	0, 1, 1, 2, 3, 5, 8, 13, 21, 34
+my $fib_drop10 = $fib->drop(10);
+
+is_deeply [ $fib_drop10->take(10) ], [
+	55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181
+];
+
+is_deeply [ $fib_drop10->take(10) ], [
+	55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181
 ];
