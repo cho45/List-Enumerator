@@ -26,7 +26,7 @@ __END__
 
 =head1 NAME
 
-List::Enumerator -
+List::Enumerator - list construct library
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,16 @@ List::Enumerator -
 =head1 DESCRIPTION
 
 List::Enumerator is list library like Enumerator of Ruby.
+
+List::Enumerator::E is interface wrapper for generating List::Enumerator::Array or List::Enumerator::Sub.
+
+=over
+
+=item E(list), E([arrayref])
+
+=item E({ next => sub {}, rewind => sub {} })
+
+=back
 
 =head2 Concept
 
