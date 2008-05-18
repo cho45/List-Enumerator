@@ -34,11 +34,6 @@ task :shipit => [:test, "MANIFEST"]
 Rake::ShipitTask.new do |s|
 	ENV["LANG"] = "C"
 	s.Step.new {
-		# check
-		system("svn", "up")
-		raise "Any chages remain?\n#{`svn st`}" unless `svn st`.empty?
-	}.and {}
-	s.Step.new {
 		system "shipit", "-n"
 		print "Check dry-run result and press Any Key to continue (or cancel by Ctrl-C)."
 		$stdin.gets
