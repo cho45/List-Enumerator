@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 4;
+use Test::More tests => 7;
 
 use lib "lib";
 use List::Enumerator qw/E/;
