@@ -99,16 +99,16 @@ Returns List::Enumerator::Sub. ex:
 
 =item * Method chain
 
-=item * Read the Context
+=item * Read the context
 
-=item * Applicable (implemented as Moose::Role).
+=item * Applicable (implemented as Moose::Role)
 
 =back
 
 
 =head1 DEVELOPMENT
 
-This module is developing at github L<http://github.com/cho45/list-enumerator/tree/master>.
+This module is developing on github L<http://github.com/cho45/list-enumerator/tree/master>.
 
 
 =head1 AUTHOR
