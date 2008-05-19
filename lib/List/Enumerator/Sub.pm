@@ -6,7 +6,7 @@ use overload
 with "List::Enumerator::Role";
 
 has "next_sub"   => ( is => "rw", isa => "CodeRef" );
-has "rewind_sub" => ( is => "rw", isa => "CodeRef" );
+has "rewind_sub" => ( is => "rw", isa => "CodeRef", default => sub { sub {} });
 
 sub BUILD {
 	my ($self, $params) = @_;
@@ -31,15 +31,11 @@ sub rewind {
 	my ($self, $new) = @_;
 
 	if ($new) {
-		$self->rewind_subb($new);
+		$self->rewind_sub($new);
 		$self;
 	} else {
-		if ($self->rewind_sub) {
-			$self->rewind_sub->();
-			$self;
-		} else {
-			die "Not Implemented";
-		}
+		$self->rewind_sub->();
+		$self;
 	}
 }
 

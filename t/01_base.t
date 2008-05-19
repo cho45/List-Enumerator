@@ -209,6 +209,15 @@ sub test_act_as_arrayref : Test(2) {
 	is $list->[3], 1;
 }
 
+sub test_sub : Test(1) {
+	my $list = E({
+		next => sub {
+			$_->stop;
+		}
+	});
+
+	is_deeply $list->to_a, [];
+}
 
 __PACKAGE__->runtests;
 
