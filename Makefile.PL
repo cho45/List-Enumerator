@@ -2,7 +2,7 @@ use inc::Module::Install;
 name 'List-Enumerator';
 all_from 'lib/List/Enumerator.pm';
 
-requires $_ for (qw/Moose List::Util List::MoreUtils/);
+requires $_ for (qw/Moose List::Util List::MoreUtils Exception::Class/);
 
 build_requires 'Test::More';
 build_requires 'Test::Class';
