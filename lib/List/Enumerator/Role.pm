@@ -340,10 +340,11 @@ sub to_a {
 	[ $self->each ];
 }
 
-sub dup {
+sub expand {
 	my ($self) = @_;
 	List::Enumerator::Array->new(array => $self->to_a);
 }
+*dup = \&expand;
 
 sub rewind {
 	die "Not implemented.";

@@ -29,6 +29,32 @@ sub to_a {
 	$self->array;
 }
 
+sub push {
+	my ($self, @args) = @_;
+	push @{$self->array}, @args;
+	$self;
+}
+
+sub unshift {
+	my ($self, @args) = @_;
+	unshift @{$self->array}, @args;
+	$self;
+}
+
+sub shift {
+	my ($self) = @_;
+	shift @{$self->array};
+}
+
+sub pop {
+	my ($self) = @_;
+	pop @{$self->array};
+}
+
+sub join {
+	my ($self, $sep) = @_;
+	join $sep || "", @{$self->array};
+}
 
 __PACKAGE__->meta->make_immutable;
 
