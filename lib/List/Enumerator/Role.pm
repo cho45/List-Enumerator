@@ -9,17 +9,26 @@ requires "next";
 
 has "is_beginning" => ( is => "rw", isa => "Bool", default => sub { 1 } );
 
-before "next" => sub {
-	shift->is_beginning(0);
+around "next" => sub {
+	my $next = shift;
+	my ($self, @args) = @_;
+	$self->is_beginning(0);
+	$next->($self, @args);
 };
 
-before "rewind" => sub {
-	shift->is_beginning(1);
+around "rewind" => sub {
+	my $next = shift;
+	my ($self, @args) = @_;
+	unless ($self->is_beginning) {
+		$next->($self, @args);
+		$self->is_beginning(1);
+	}
+	$self;
 };
 
 sub select {
 	my ($self, $block) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	List::Enumerator::Sub->new(
 		next => sub {
@@ -38,7 +47,7 @@ sub select {
 
 sub reduce {
 	my ($self, $result, $block) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	no strict 'refs';
 
@@ -128,7 +137,7 @@ sub sort_by {
 
 sub chain {
 	my ($self, @others) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my ($elements, $current);
 	$elements = List::Enumerator::E([ map { List::Enumerator::E($_)->rewind } $self, @others ]);
@@ -167,7 +176,7 @@ sub chain {
 
 sub take {
 	my ($self, $arg) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my $ret;
 	if (ref $arg eq "CODE") {
@@ -206,7 +215,7 @@ sub take {
 
 sub drop {
 	my ($self, $arg) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my $ret;
 	if (ref $arg eq "CODE") {
@@ -254,7 +263,7 @@ sub some {
 
 sub zip {
 	my ($self, @others) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my $elements = [
 		map {
@@ -315,7 +324,7 @@ sub countup {
 
 sub cycle {
 	my ($self) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my @cache = ();
 	List::Enumerator::Sub->new({
@@ -347,7 +356,7 @@ sub cycle {
 
 sub map {
 	my ($self, $block) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my $ret = List::Enumerator::Sub->new({
 		next => sub {
@@ -363,7 +372,7 @@ sub map {
 
 sub each {
 	my ($self, $block) = @_;
-	$self->rewind unless $self->is_beginning;
+	$self->rewind;
 
 	my @ret;
 	eval {
