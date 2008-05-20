@@ -7,6 +7,16 @@ use List::MoreUtils;
 
 requires "next";
 
+has "is_beginning" => ( is => "rw", isa => "Bool", default => sub { 1 } );
+
+before "next" => sub {
+	shift->is_beginning(0);
+};
+
+before "rewind" => sub {
+	shift->is_beginning(1);
+};
+
 sub select {
 	my ($self, $block) = @_;
 	List::Enumerator::Sub->new(
@@ -146,6 +156,7 @@ sub chain {
 
 sub take {
 	my ($self, $arg) = @_;
+	$self->rewind unless $self->is_beginning;
 	my $ret;
 	if (ref $arg eq "CODE") {
 		$ret = List::Enumerator::Sub->new(
@@ -160,7 +171,7 @@ sub take {
 			rewind => sub {
 				$self->rewind;
 			}
-		)->rewind;
+		);
 	} else {
 		my $i;
 		$ret = List::Enumerator::Sub->new(
@@ -175,7 +186,7 @@ sub take {
 				$self->rewind;
 				$i = 0;
 			}
-		)->rewind;
+		);
 	}
 	wantarray? $ret->to_list : $ret;
 }
@@ -183,9 +194,11 @@ sub take {
 
 sub drop {
 	my ($self, $arg) = @_;
+	$self->rewind unless $self->is_beginning;
 	my $ret;
 	if (ref $arg eq "CODE") {
 		my $first;
+		do { $first = $self->next } while ($arg->(local $_ = $first));
 		$ret = List::Enumerator::Sub->new(
 			next => sub {
 				my $ret = $first || $self->next;
@@ -194,22 +207,22 @@ sub drop {
 			},
 			rewind => sub {
 				$self->rewind;
-				do {
-					$first = $self->next;
-				} while ($arg->(local $_ = $first));
+				do { $first = $self->next } while ($arg->(local $_ = $first));
 			}
-		)->rewind;
+		);
 	} else {
+		my $i = $arg;
+		$self->next while ($i--);
 		$ret = List::Enumerator::Sub->new(
 			next => sub {
 				$self->next;
 			},
 			rewind => sub {
-				my $i = $arg;
 				$self->rewind;
+				my $i = $arg;
 				$self->next while ($i--);
 			}
-		)->rewind;
+		);
 	}
 	wantarray? $ret->to_list : $ret;
 }
@@ -316,7 +329,6 @@ sub map {
 
 sub each {
 	my ($self, $block) = @_;
-	$self->rewind;
 
 	my @ret;
 	eval {

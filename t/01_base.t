@@ -9,6 +9,8 @@ use List::Enumerator qw/E/;
 use List::Enumerator::Array;
 use List::Enumerator::Sub;
 
+use Data::Dumper;
+sub p ($) { warn Dumper shift }
 
 sub test_each : Test(6) {
 	my $result = [];
@@ -34,8 +36,8 @@ sub test_each : Test(6) {
 
 	my $list = E(1, 2, 3);
 	$list->next;
-	is_deeply $list->to_a, [1, 2, 3];
-	is_deeply [ $list->each], [1, 2, 3];
+	is_deeply [ $list->each ], [2, 3];
+	is_deeply [ $list->each ], [1, 2, 3];
 }
 
 
@@ -217,6 +219,40 @@ sub test_sub : Test(1) {
 	});
 
 	is_deeply $list->to_a, [];
+}
+
+sub test_performance : Test(9) {
+	my $list = E(1)->to(10);
+	my ($next, $rewind);
+
+	my $enum = E({
+		next => sub {
+			$next++;
+			$list->next;
+		},
+		rewind => sub {
+			$rewind++;
+			$list->rewind;
+		}
+	});
+
+	$enum->rewind;
+	($next, $rewind) = (0, 0);
+	is_deeply $enum->take(5)->to_a, [1, 2, 3, 4, 5];
+	is $next, 5;
+	is $rewind, 0;
+
+	$enum->rewind;
+	($next, $rewind) = (0, 0);
+	is_deeply $enum->drop(5)->to_a, [6, 7, 8, 9, 10];
+	is $next, 11;
+	is $rewind, 0;
+
+	$enum->rewind;
+	($next, $rewind) = (0, 0);
+	is_deeply $enum->drop(5)->take(5)->to_a, [6, 7, 8, 9, 10];
+	is $next, 10;
+	is $rewind, 0;
 }
 
 __PACKAGE__->runtests;
