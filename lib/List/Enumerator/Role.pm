@@ -19,6 +19,7 @@ before "rewind" => sub {
 
 sub select {
 	my ($self, $block) = @_;
+	$self->rewind unless $self->is_beginning;
 
 	List::Enumerator::Sub->new(
 		next => sub {
@@ -38,6 +39,7 @@ sub select {
 sub reduce {
 	my ($self, $result, $block) = @_;
 	$self->rewind unless $self->is_beginning;
+
 	no strict 'refs';
 
 	if (@_ == 2) {
@@ -126,9 +128,10 @@ sub sort_by {
 
 sub chain {
 	my ($self, @others) = @_;
+	$self->rewind unless $self->is_beginning;
 
 	my ($elements, $current);
-	$elements = List::Enumerator::E([ map { List::Enumerator::E($_) } $self, @others ]);
+	$elements = List::Enumerator::E([ map { List::Enumerator::E($_)->rewind } $self, @others ]);
 	$current = $elements->next;
 
 	my @cache = ();
@@ -251,9 +254,11 @@ sub some {
 
 sub zip {
 	my ($self, @others) = @_;
+	$self->rewind unless $self->is_beginning;
+
 	my $elements = [
 		map {
-			List::Enumerator::E($_);
+			List::Enumerator::E($_)->rewind;
 		}
 		$self, @others
 	];
@@ -310,6 +315,8 @@ sub countup {
 
 sub cycle {
 	my ($self) = @_;
+	$self->rewind unless $self->is_beginning;
+
 	my @cache = ();
 	List::Enumerator::Sub->new({
 		next => sub {

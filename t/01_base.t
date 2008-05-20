@@ -157,11 +157,10 @@ sub test_zip : Test(3) {
 
 	my $list1 = E(1, 2, 3);
 	my $list2 = E(qw/a b c/);
-	$list1->next;
-	$list2->next;
+	$list1->next; $list2->next;
 
 	my $zip = $list1->zip($list2);
-	is_deeply $zip->to_a, [ [2, "b"], [3, "c"] ];
+	is_deeply $zip->to_a, [ [1, "a"], [2, "b"], [3, "c"] ];
 }
 
 
@@ -185,10 +184,9 @@ sub test_select : Test(3) {
 
 	my $list = E(1)->countup;
 	$list->next;
-	$list->next;
 	is_deeply $list->select(sub {
 		$_ % 2;
-	})->take(4)->to_a, [4, 6, 8, 10];
+	})->take(4)->to_a, [2, 4, 6, 8];
 }
 
 sub test_reduce : Test(2) {
@@ -230,13 +228,13 @@ sub test_chain : Test(4) {
 	$list2->next;
 	my $chain = $list1->chain($list2);
 
-	is_deeply $chain->to_a, [2, 3, 5, 6];
+	is_deeply $chain->to_a, [1, 2, 3, 4, 5, 6];
 
 	$chain->rewind;
-	is_deeply $chain->to_a, [2, 3, 5, 6];
+	is_deeply $chain->to_a, [1, 2, 3, 4, 5, 6];
 
 	$chain->rewind;
-	is_deeply $chain->to_a, [2, 3, 5, 6];
+	is_deeply $chain->to_a, [1, 2, 3, 4, 5, 6];
 }
 
 sub test_act_as_arrayref : Test(2) {
