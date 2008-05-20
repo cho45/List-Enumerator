@@ -36,7 +36,7 @@ sub test_each : Test(6) {
 
 	my $list = E(1, 2, 3);
 	$list->next;
-	is_deeply [ $list->each ], [2, 3];
+	is_deeply [ $list->each ], [1, 2, 3];
 	is_deeply [ $list->each ], [1, 2, 3];
 }
 
@@ -104,8 +104,10 @@ sub test_cycle : Test(9) {
 }
 
 
-sub test_countup : Test(10) {
-	my $list = E()->countup;
+sub test_countup : Test(14) {
+	my $list;
+
+	$list = E()->countup;
 	is $list->next, 0;
 	is $list->next, 1;
 	is $list->next, 2;
@@ -117,6 +119,13 @@ sub test_countup : Test(10) {
 
 	is_deeply E(1)->to(5)->to_a, [1, 2, 3, 4, 5];
 	is_deeply E(5)->to(5)->to_a, [5];
+
+	$list = E(1, 2);
+	is $list->next, 1;
+	my $countup = $list->countup;
+	is $countup->next, 2;
+	is $countup->next, 3;
+	is $countup->rewind->next, 2;
 }
 
 sub test_take : Test(5) {
@@ -137,7 +146,7 @@ sub test_drop : Test(4) {
 }
 
 
-sub test_zip : Test(2) {
+sub test_zip : Test(3) {
 	is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/]) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
 
 	my $result = [];
@@ -145,6 +154,14 @@ sub test_zip : Test(2) {
 		push @$result, $_;
 	});
 	is_deeply $result, [ [1, "a"], [2, "b"], [3, "c"] ];
+
+	my $list1 = E(1, 2, 3);
+	my $list2 = E(qw/a b c/);
+	$list1->next;
+	$list2->next;
+
+	my $zip = $list1->zip($list2);
+	is_deeply $zip->to_a, [ [2, "b"], [3, "c"] ];
 }
 
 
@@ -157,7 +174,7 @@ sub test_with_index : Test(1) {
 	is_deeply $result, [qw/a 0 b 1 c 2/];
 }
 
-sub test_select : Test(2) {
+sub test_select : Test(3) {
 	is_deeply E(1)->to(10)->select(sub {
 		$_ % 2;
 	})->to_a, [2, 4, 6, 8, 10];
@@ -165,6 +182,13 @@ sub test_select : Test(2) {
 	is_deeply E(1)->countup->select(sub {
 		$_ % 2;
 	})->take(4)->to_a, [2, 4, 6, 8];
+
+	my $list = E(1)->countup;
+	$list->next;
+	$list->next;
+	is_deeply $list->select(sub {
+		$_ % 2;
+	})->take(4)->to_a, [4, 6, 8, 10];
 }
 
 sub test_reduce : Test(2) {
@@ -197,8 +221,22 @@ sub test_min : Test(2) {
 	is E(1, 2, 3)->min_by(sub { 100 - $_ }), 3;
 }
 
-sub test_chain : Test {
+sub test_chain : Test(4) {
 	is_deeply E(1, 2, 3)->chain([4, 5, 6])->to_a , [1, 2, 3, 4, 5, 6];
+
+	my $list1 = E(1, 2, 3);
+	$list1->next;
+	my $list2 = E(4, 5, 6);
+	$list2->next;
+	my $chain = $list1->chain($list2);
+
+	is_deeply $chain->to_a, [2, 3, 5, 6];
+
+	$chain->rewind;
+	is_deeply $chain->to_a, [2, 3, 5, 6];
+
+	$chain->rewind;
+	is_deeply $chain->to_a, [2, 3, 5, 6];
 }
 
 sub test_act_as_arrayref : Test(2) {

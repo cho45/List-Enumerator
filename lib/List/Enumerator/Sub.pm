@@ -34,6 +34,7 @@ sub rewind {
 		$self->rewind_sub($new);
 		$self;
 	} else {
+		local $_ = $self;
 		$self->rewind_sub->();
 		$self;
 	}

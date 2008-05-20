@@ -11,10 +11,14 @@ has "index" => ( is => "rw", isa => "Int", default => sub { 0 } );
 sub next {
 	my ($self) = @_;
 
-	$self->stop if $self->index >= @{$self->array};
+	my $i = $self->index;
 
-	$self->index($self->index + 1);
-	$self->array->[$self->index - 1];
+	if ($i < @{$self->array}) {
+		$self->index($i + 1);
+		$self->array->[$i];
+	} else {
+		$self->stop;
+	}
 }
 
 sub rewind {

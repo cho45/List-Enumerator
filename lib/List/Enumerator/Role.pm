@@ -19,6 +19,7 @@ before "rewind" => sub {
 
 sub select {
 	my ($self, $block) = @_;
+
 	List::Enumerator::Sub->new(
 		next => sub {
 			local $_;
@@ -30,12 +31,13 @@ sub select {
 		rewind => sub {
 			$self->rewind;
 		}
-	)->rewind;
+	);
 }
 *find_all = \&select;
 
 sub reduce {
 	my ($self, $result, $block) = @_;
+	$self->rewind unless $self->is_beginning;
 	no strict 'refs';
 
 	if (@_ == 2) {
@@ -124,32 +126,38 @@ sub sort_by {
 
 sub chain {
 	my ($self, @others) = @_;
+
 	my ($elements, $current);
+	$elements = List::Enumerator::E([ map { List::Enumerator::E($_) } $self, @others ]);
+	$current = $elements->next;
+
+	my @cache = ();
+	my $i = 0;
 	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			my $ret;
-			eval {
-				$ret = $current->next;
-			}; if (Exception::Class->caught("StopIteration") ) {
-				$current = $elements->next;
-				$ret = $current->next;
+			if ($i < @cache) {
+				$ret = $cache[$i];
 			} else {
-				my $e = Exception::Class->caught();
-				ref $e ? $e->rethrow : die $e if $e;
+				eval {
+					$ret = $current->next;
+					push @cache, $ret;
+				}; if (Exception::Class->caught("StopIteration") ) {
+					$current = $elements->next;
+					$ret = $current->next;
+					push @cache, $ret;
+				} else {
+					my $e = Exception::Class->caught();
+					ref $e ? $e->rethrow : die $e if $e;
+				}
 			}
+			$i++;
 			$ret;
 		},
 		rewind => sub {
-			$elements = List::Enumerator::E([
-				map {
-					List::Enumerator::E($_)->rewind;
-				}
-				$self, @others
-			]);
-
-			$current = $elements->next;
+			$i = 0;
 		}
-	)->rewind;
+	);
 
 	wantarray? $ret->to_list : $ret;
 }
@@ -157,6 +165,7 @@ sub chain {
 sub take {
 	my ($self, $arg) = @_;
 	$self->rewind unless $self->is_beginning;
+
 	my $ret;
 	if (ref $arg eq "CODE") {
 		$ret = List::Enumerator::Sub->new(
@@ -195,32 +204,36 @@ sub take {
 sub drop {
 	my ($self, $arg) = @_;
 	$self->rewind unless $self->is_beginning;
+
 	my $ret;
 	if (ref $arg eq "CODE") {
 		my $first;
-		do { $first = $self->next } while ($arg->(local $_ = $first));
 		$ret = List::Enumerator::Sub->new(
 			next => sub {
-				my $ret = $first || $self->next;
-				$first = undef if $first;
+				my $ret;
+				unless ($first) {
+					do { $first = $self->next } while ($arg->(local $_ = $first));
+					$ret = $first;
+				} else {
+					$ret = $self->next;
+				}
 				$ret;
 			},
 			rewind => sub {
 				$self->rewind;
-				do { $first = $self->next } while ($arg->(local $_ = $first));
+				$first = undef;
 			}
 		);
 	} else {
 		my $i = $arg;
-		$self->next while ($i--);
 		$ret = List::Enumerator::Sub->new(
 			next => sub {
+				$self->next while (0 < $i--);
 				$self->next;
 			},
 			rewind => sub {
 				$self->rewind;
-				my $i = $arg;
-				$self->next while ($i--);
+				$i = $arg;
 			}
 		);
 	}
@@ -238,24 +251,36 @@ sub some {
 
 sub zip {
 	my ($self, @others) = @_;
-	my $elements;
+	my $elements = [
+		map {
+			List::Enumerator::E($_);
+		}
+		$self, @others
+	];
+	my @cache = ();
 	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			my $ret = [];
 			for (@$elements) {
 				push @$ret, $_->next;
 			}
+			push @cache, $ret;
 			$ret;
 		},
 		rewind => sub {
-			$elements = [
-				map {
-					List::Enumerator::E($_);
+			my $i = 0;
+			$_->next(sub {
+				if ($i < @cache) {
+					$cache[$i++];
+				} else {
+					StopIteration->throw;
 				}
-				$self, @others
-			];
+			});
+			$_->rewind(sub {
+				$i = 0;
+			});
 		}
-	)->rewind;
+	);
 
 	wantarray? $ret->to_list : $ret;
 }
@@ -267,17 +292,17 @@ sub with_index {
 
 sub countup {
 	my ($self, $lim) = @_;
-	my $i;
+	my $start = eval { $self->next } || 0;
+	my $i = $start;
 	List::Enumerator::Sub->new({
 		next => sub {
 			($lim && $i > $lim) && StopIteration->throw;
 			$i++;
 		},
 		rewind => sub {
-			$self->rewind;
-			$i = eval { $self->next } || 0;
+			$i = $start;
 		}
-	})->rewind;
+	});
 }
 *countup_to = \&countup;
 *to = \&countup;
@@ -285,7 +310,7 @@ sub countup {
 
 sub cycle {
 	my ($self) = @_;
-	my @cache;
+	my @cache = ();
 	List::Enumerator::Sub->new({
 		next => sub {
 			my ($this) = @_;
@@ -310,11 +335,13 @@ sub cycle {
 			$self->rewind;
 			@cache = ();
 		}
-	})->rewind;
+	});
 }
 
 sub map {
 	my ($self, $block) = @_;
+	$self->rewind unless $self->is_beginning;
+
 	my $ret = List::Enumerator::Sub->new({
 		next => sub {
 			local $_ = $self->next;
@@ -329,6 +356,7 @@ sub map {
 
 sub each {
 	my ($self, $block) = @_;
+	$self->rewind unless $self->is_beginning;
 
 	my @ret;
 	eval {
@@ -364,7 +392,6 @@ sub rewind {
 
 sub stop {
 	my ($self) = @_;
-	eval { $self->rewind };
 	StopIteration->throw;
 }
 
