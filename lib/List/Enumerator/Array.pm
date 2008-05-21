@@ -41,24 +41,37 @@ sub to_list {
 
 sub push {
 	my ($self, @args) = @_;
-	push @{$self->array}, @args;
+	CORE::push @{$self->array}, @args;
 	$self;
 }
 
 sub unshift {
 	my ($self, @args) = @_;
-	unshift @{$self->array}, @args;
+	CORE::unshift @{$self->array}, @args;
 	$self;
 }
 
+sub prepend {
+	my ($self, $args) = @_;
+	CORE::unshift @{$self->array}, @$args;
+	$self;
+}
+
+sub concat {
+	my ($self, $args) = @_;
+	CORE::push @{$self->array}, @$args;
+	$self;
+}
+*append = \&concat;
+
 sub shift {
 	my ($self) = @_;
-	shift @{$self->array};
+	CORE::shift @{$self->array};
 }
 
 sub pop {
 	my ($self) = @_;
-	pop @{$self->array};
+	CORE::pop @{$self->array};
 }
 
 __PACKAGE__->meta->make_immutable;

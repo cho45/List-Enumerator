@@ -365,7 +365,32 @@ sub test_each_cons : Test(3) {
 	];
 }
 
+sub test_slice : Test(15) {
+	my $list = E(1..100);
+
+	is $list->slice(0), 1;
+	is $list->slice(99), 100;
+	is $list->slice(100), undef;
+	is $list->slice(-1), 100;
+	is $list->slice(-2), 99;
+	is $list->slice(-100), 1;
+	is $list->slice(-101), undef;
+
+	is_deeply [ $list->slice(0, 0) ], [ 1 ];
+	is_deeply [ $list->slice(99, 99) ], [ 100 ];
+	is_deeply [ $list->slice(-1, -1) ], [ 100 ];
+	is_deeply [ $list->slice(-2, -2) ], [ 99 ];
+	is_deeply [ $list->slice(100, 100) ], [];
+
+	is_deeply [ $list->slice(9, 11) ], [ 10, 11, 12 ];
+	is_deeply [ $list->slice(-91, -89) ], [ 10, 11, 12 ];
+
+	is_deeply [ $list->slice(-101, 2) ], [];
+}
+
 sub test_each_slice : Test(3) {
+	my $result;
+
 	$result = [];
 	E(1, 2, 3, 4, 5)->each_slice(2, sub {
 		push @$result, [ @_ ];

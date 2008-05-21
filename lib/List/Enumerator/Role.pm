@@ -80,6 +80,29 @@ sub reduce {
 }
 *inject = \&reduce;
 
+sub slice {
+	my ($self, $start, $end) = @_;
+	my @list = $self->to_list;
+	if (defined $end) {
+		return () if abs $start > @list;
+		$start = @list + $start if $start < 0;
+		$end = @list + $end if $end < 0;
+		$end = $#list if $end > $#list;
+		return () if $start > @list;
+		return () if $start > $end;
+
+		my @ret = @list[$start .. $end];
+		if (wantarray) {
+			@ret ? @ret : ();
+		} else {
+			@ret ? List::Enumerator::Array->new(array => \@ret)
+			     : List::Enumerator::Array->new(array => []);
+		}
+	} else {
+		$list[$start];
+	}
+};
+
 sub find {
 	my ($self, $block) = @_;
 	my $ret;
@@ -197,6 +220,32 @@ sub length {
 	scalar @{[ $self->to_list ]};
 }
 *size = \&length;
+
+sub is_empty {
+	my ($self) = @_;
+	!$self->length;
+}
+
+sub index_of {
+	my ($self, $target) = @_;
+	$self->rewind;
+
+	my $code = ref($target) eq "CODE" ? $target : sub { $_ eq $target };
+
+	my $ret = 0;
+	return eval {
+		while (1) {
+			my $item = $self->next;
+			return $ret if $code->(local $_ = $item);
+			$ret++;
+		}
+	}; if (Exception::Class->caught("StopIteration") ) { } else {
+		my $e = Exception::Class->caught();
+		ref $e ? $e->rethrow : die $e if $e;
+	}
+
+	undef;
+}
 
 sub chain {
 	my ($self, @others) = @_;
@@ -483,6 +532,7 @@ sub map {
 	});
 	wantarray? $ret->to_list : $ret;
 }
+*collect = \&map;
 
 sub each {
 	my ($self, $block) = @_;
