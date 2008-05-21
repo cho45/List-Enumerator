@@ -330,7 +330,38 @@ sub test_is_none {
 sub test_is_one {
 }
 
+sub test_sum : Test {
+	is E(1, 2, 3)->sum, 6;
+}
 
+sub test_uniq : Test {
+	is_deeply E(1, 1, 2, 3, 3, 4)->uniq->to_a, [1, 2, 3, 4];
+}
+
+sub test_sort : Test {
+	is_deeply E(5, 2, 1, 3, 4)->sort->to_a, [1, 2, 3, 4, 5];
+}
+
+sub test_compact : Test {
+	is_deeply E(undef, 1, undef, 2, 3)->compact->to_a, [1, 2, 3];
+}
+
+sub test_length : Test(4) {
+	is E(1, 2, 3)->length, 3;
+	is E()->length, 0;
+	is E(1, 2, 3)->size, 3;
+	is E()->size, 0;
+}
+
+sub test_flatten : Test(3) {
+	is_deeply E([1, 2, [3, 4], 5])->flatten->to_a, [1, 2, 3, 4, 5];
+	is_deeply E([1, [2, [3, 4]], 5])->flatten->to_a, [1, 2, 3, 4, 5];
+	is_deeply E([1, [2, [3, 4]], 5])->flatten(1)->to_a, [1, 2, [3, 4], 5];
+}
+
+sub test_reverse : Test(1) {
+	is_deeply E(5, 2, 1, 3, 4)->reverse->to_a, [4, 3, 1, 2, 5];
+}
 
 __PACKAGE__->runtests;
 

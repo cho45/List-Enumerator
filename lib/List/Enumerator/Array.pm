@@ -1,7 +1,8 @@
 package List::Enumerator::Array;
 use Moose;
 use overload
-	'@{}' => \&to_a;
+	'@{}' => \&to_a,
+	fallback => 1;
 
 with "List::Enumerator::Role";
 
@@ -58,11 +59,6 @@ sub shift {
 sub pop {
 	my ($self) = @_;
 	pop @{$self->array};
-}
-
-sub join {
-	my ($self, $sep) = @_;
-	join $sep || "", @{$self->array};
 }
 
 __PACKAGE__->meta->make_immutable;

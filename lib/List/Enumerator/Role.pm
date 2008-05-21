@@ -95,8 +95,7 @@ sub first {
 
 sub last {
 	my ($self) = @_;
-	my $ret = $self->to_a;
-	$ret->[@$ret - 1];
+	$self->to_a->[-1];
 }
 
 sub max {
@@ -134,6 +133,57 @@ sub sort_by {
 		$self->to_list
 	);
 }
+
+sub sort {
+	my ($self, $block) = @_;
+	my @ret = $block ? sort { $block->($a, $b) } $self->to_list : sort $self->to_list;
+	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
+}
+
+sub sum {
+	my ($self) = @_;
+	$self->reduce(0, sub { $a + $b });
+}
+
+sub uniq {
+	my ($self) = @_;
+	my @ret = List::MoreUtils::uniq($self->to_list);
+	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
+}
+
+sub compact {
+	my ($self) = @_;
+	my @ret = grep { defined } $self->to_list;
+	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
+}
+
+sub reverse {
+	my ($self) = @_;
+	my @ret = reverse $self->to_list;
+	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
+}
+
+sub flatten {
+	my ($self, $level) = @_;
+	my $ret = _flatten($self->to_a, $level);
+	wantarray? @$ret : List::Enumerator::Array->new(array => $ret);
+}
+
+sub _flatten {
+	my ($array, $level) = @_;
+	(defined($level) && $level <= 0) ? $array : [
+		map {
+			(ref($_) eq 'ARRAY') ? @{ _flatten($_, defined($level) ? $level - 1 : undef) } : $_;
+		}
+		@$array
+	];
+}
+
+sub length {
+	my ($self) = @_;
+	scalar @{[ $self->to_list ]};
+}
+*size = \&length;
 
 sub chain {
 	my ($self, @others) = @_;
