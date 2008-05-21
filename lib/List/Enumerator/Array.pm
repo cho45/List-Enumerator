@@ -33,6 +33,11 @@ sub to_a {
 	$self->array;
 }
 
+sub to_list {
+	my ($self) = @_;
+	@{$self->array};
+}
+
 sub push {
 	my ($self, @args) = @_;
 	push @{$self->array}, @args;

@@ -354,6 +354,11 @@ sub cycle {
 	});
 }
 
+sub join {
+	my ($self, $sep) = @_;
+	join $sep || "", $self->to_list;
+}
+
 sub map {
 	my ($self, $block) = @_;
 	$self->rewind;
@@ -388,7 +393,6 @@ sub each {
 
 	wantarray? @ret : $self;
 }
-
 *to_list = \&each;
 
 sub to_a {
