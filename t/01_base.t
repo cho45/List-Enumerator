@@ -323,31 +323,112 @@ sub test_partition : Test(3) {
 	is_deeply $odd,  [1, 3, 5, 7, 9];
 }
 
-sub test_is_include : Test(2) {
+sub test_is_include : Test(4) {
+	is E(qw/a b c/)->is_include("a"), 1;
+	is E(qw/a b c/)->is_include(1), 0;
 	is E(qw/a b c/)->include("a"), 1;
 	is E(qw/a b c/)->include(1), 0;
 }
 
-sub test_grep {
+sub test_grep : Test {
 	is_deeply E(1)->to(10)->grep(sub { $_ % 2 == 0 })->to_a, [2, 4, 6, 8, 10];
 }
 
-sub test_each_cons {
+sub test_each_cons : Test(3) {
+	my $result = [];
+
+	$result = [];
+	E(1, 2, 3, 4, 5)->each_cons(2, sub {
+		push @$result, [ @_ ];
+	});
+	is_deeply $result, [
+		[1, 2],
+		[2, 3],
+		[3, 4],
+		[4, 5]
+	];
+
+	$result = [];
+	E(1, 2, 3, 4, 5)->each_cons(3, sub {
+		push @$result, [ @_ ];
+	});
+	is_deeply $result, [
+		[1, 2, 3],
+		[2, 3, 4],
+		[3, 4, 5]
+	];
+
+	is_deeply E(1)->countup->each_cons(3)->take(3)->to_a, [
+		[1, 2, 3],
+		[2, 3, 4],
+		[3, 4, 5]
+	];
 }
 
-sub test_each_slice {
+sub test_each_slice : Test(3) {
+	$result = [];
+	E(1, 2, 3, 4, 5)->each_slice(2, sub {
+		push @$result, [ @_ ];
+	});
+	is_deeply $result, [
+		[1, 2],
+		[2, 4],
+		[5]
+	];
+
+	$result = [];
+	E(1)->(10)->each_slice(3, sub {
+		push @$result, [ @_ ];
+	});
+	is_deeply $result, [
+		[1, 2, 3],
+		[4, 5, 6],
+		[7, 8, 9],
+		[10]
+	];
+
+	is_deeply E(1)->countup->each_slice(3)->take(3)->to_a, [
+		[1, 2, 3],
+		[4, 5, 6],
+		[7, 8, 9],
+	];
 }
 
-sub test_find_index {
+sub test_find_index : Test(2) {
+	is E(qw/a b c/)->find_index("a"), 0;
+	is E(qw/a b c/)->find_index("c"), 2;
 }
 
-sub test_minmax {
+sub test_minmax : Test(4) {
+	my ($min, $max);
+
+	($min, $max) = E(1, 2, 3)->minmax;
+	is $min, 1;
+	is $max, 3;
+
+	($min, $max) = E([{ n => 1 }, { n => 2 }, { n => 3 }])->minmax_by(sub { $_->{n} });
+	is $min, 1;
+	is $max, 3;
 }
 
-sub test_is_none {
+sub test_is_none : Test(6) {
+	is E(0, 0, 0, 0)->none, 1;
+	is E(0, 0, 0, 1)->none, 0;
+	is E(0, 0, 1, 1)->none, 0;
+
+	is E(3, 5, 7, 9)->none(sub { $_ % 2 == 0 }), 1;
+	is E(2, 5, 7, 9)->none(sub { $_ % 2 == 0 }), 0;
+	is E(2, 4, 7, 9)->none(sub { $_ % 2 == 0 }), 0;
 }
 
-sub test_is_one {
+sub test_is_one : Test(6) {
+	is E(0, 0, 0, 0)->one, 0;
+	is E(0, 0, 0, 1)->one, 1;
+	is E(0, 0, 1, 1)->one, 0;
+
+	is E(3, 5, 7, 9)->one(sub { $_ % 2 == 0 }), 0;
+	is E(2, 5, 7, 9)->one(sub { $_ % 2 == 0 }), 1;
+	is E(2, 4, 7, 9)->one(sub { $_ % 2 == 0 }), 0;
 }
 
 sub test_some : Test(2) {
