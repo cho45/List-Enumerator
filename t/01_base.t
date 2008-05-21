@@ -291,5 +291,40 @@ sub test_performance : Test(9) {
 	is $rewind, 0;
 }
 
+sub test_group_by {
+}
+
+sub test_reject {
+}
+
+sub test_partition {
+}
+
+sub test_is_include {
+}
+
+sub test_grep {
+}
+
+sub test_each_cons {
+}
+
+sub test_each_slice {
+}
+
+sub test_find_index {
+}
+
+sub test_minmax {
+}
+
+sub test_is_none {
+}
+
+sub test_is_one {
+}
+
+
+
 __PACKAGE__->runtests;
 
