@@ -147,7 +147,13 @@ sub test_drop : Test(4) {
 
 
 sub test_zip : Test(3) {
-	is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/]) ], [ [1, 0, "a"], [2, 1, "b"], [3, 2, "c"] ];
+	is_deeply [ E(1, 2, 3, 4, 5)->zip(E()->countup, [qw/a b c/]) ], [
+		[1, 0, "a"],
+		[2, 1, "b"],
+		[3, 2, "c"],
+		[4, 3, undef],
+		[5, 4, undef]
+	];
 
 	my $result = [];
 	E(1, 2, 3)->zip([qw/a b c/])->each(sub {

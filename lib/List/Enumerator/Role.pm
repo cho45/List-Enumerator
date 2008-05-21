@@ -269,14 +269,24 @@ sub zip {
 		map {
 			List::Enumerator::E($_)->rewind;
 		}
-		$self, @others
+		@others
 	];
 	my @cache = ();
 	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			my $ret = [];
+			push @$ret, $self->next;
 			for (@$elements) {
-				push @$ret, $_->next;
+				my $n;
+				eval {
+					$n = $_->next;
+				}; if (Exception::Class->caught("StopIteration") ) {
+					$n = undef;
+				} else {
+					my $e = Exception::Class->caught();
+					ref $e ? $e->rethrow : die $e if $e;
+				}
+				push @$ret, $n;
 			}
 			push @cache, $ret;
 			$ret;
