@@ -35,7 +35,7 @@ sub select {
 			local $_;
 			do {
 				$_ = $self->next;
-			} while ($block->($_));
+			} while (!$block->($_));
 			$_;
 		},
 		rewind => sub {
@@ -44,6 +44,13 @@ sub select {
 	);
 }
 *find_all = \&select;
+
+sub reject {
+	my ($self, $block) = @_;
+	$self->select(sub {
+		!$block->($_);
+	});
+}
 
 sub reduce {
 	my ($self, $result, $block) = @_;
@@ -148,6 +155,12 @@ sub sum {
 sub uniq {
 	my ($self) = @_;
 	my @ret = List::MoreUtils::uniq($self->to_list);
+	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
+}
+
+sub grep {
+	my ($self, $block) = @_;
+	my @ret = grep { $block->($_) } $self->to_list;
 	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
 }
 
@@ -304,10 +317,20 @@ sub drop {
 *drop_while = \&drop_while;
 
 sub every {
+	my ($self, $block) = @_;
+	for ($self->to_list) {
+		return 0 unless $block->($_);
+	}
+	return 1;
 }
 *all = \&every;
 
 sub some {
+	my ($self, $block) = @_;
+	for ($self->to_list) {
+		return 1 if $block->($_);
+	}
+	return 0;
 }
 *any = \&some;
 
@@ -418,6 +441,32 @@ sub join {
 	my ($self, $sep) = @_;
 	join $sep || "", $self->to_list;
 }
+
+sub group_by {
+	my ($self, $block) = @_;
+	$self->reduce({}, sub {
+		local $_ = $b;
+		my $r = $block->($b);
+		$a->{$r} ||= [];
+		push @{ $a->{$r} }, $b;
+		$a;
+	});
+}
+
+sub partition {
+	my ($self, $block) = @_;
+	my $ret = $self->group_by(sub {
+		$block->($_) ? 1 : 0;
+	});
+
+	wantarray? ($ret->{1}, $ret->{0}) : [$ret->{1}, $ret->{0}];
+}
+
+sub is_include {
+	my ($self, $target) = @_;
+	$self->some(sub { $_ eq $target });
+}
+*include = \&is_include;
 
 sub map {
 	my ($self, $block) = @_;

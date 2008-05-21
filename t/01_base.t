@@ -181,17 +181,17 @@ sub test_with_index : Test(1) {
 
 sub test_select : Test(3) {
 	is_deeply E(1)->to(10)->select(sub {
-		$_ % 2;
+		$_ % 2 == 0;
 	})->to_a, [2, 4, 6, 8, 10];
 
 	is_deeply E(1)->countup->select(sub {
-		$_ % 2;
+		$_ % 2 == 0;
 	})->take(4)->to_a, [2, 4, 6, 8];
 
 	my $list = E(1)->countup;
 	$list->next;
 	is_deeply $list->select(sub {
-		$_ % 2;
+		$_ % 2 == 0;
 	})->take(4)->to_a, [2, 4, 6, 8];
 }
 
@@ -297,19 +297,39 @@ sub test_performance : Test(9) {
 	is $rewind, 0;
 }
 
-sub test_group_by {
+sub test_group_by : Test {
+	is_deeply E([
+		{ cat => 'a' }, { cat => 'a' },{ cat => 'a' },{ cat => 'a' },
+		{ cat => 'b' }, { cat => 'b' },{ cat => 'b' },{ cat => 'b' },
+		{ cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' },
+	])->group_by(sub {
+		$_->{cat};
+	}), {
+		'a' => [ { cat => 'a' }, { cat => 'a' },{ cat => 'a' },{ cat => 'a' } ],
+		'b' => [ { cat => 'b' }, { cat => 'b' },{ cat => 'b' },{ cat => 'b' } ],
+		'c' => [ { cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' } ],
+	};
 }
 
-sub test_reject {
+sub test_reject : Test {
+	is_deeply E(1)->to(10)->reject(sub { $_ % 2 == 0 })->to_a, [1, 3, 5, 7, 9];
 }
 
-sub test_partition {
+sub test_partition : Test(3) {
+	is_deeply scalar E(1)->to(10)->partition(sub { $_ % 2 == 0 }), [ [2, 4, 6, 8, 10], [1, 3, 5, 7, 9] ];
+
+	my ($even, $odd) = E(1)->to(10)->partition(sub { $_ % 2 == 0 });
+	is_deeply $even, [2, 4, 6, 8, 10];
+	is_deeply $odd,  [1, 3, 5, 7, 9];
 }
 
-sub test_is_include {
+sub test_is_include : Test(2) {
+	is E(qw/a b c/)->include("a"), 1;
+	is E(qw/a b c/)->include(1), 0;
 }
 
 sub test_grep {
+	is_deeply E(1)->to(10)->grep(sub { $_ % 2 == 0 })->to_a, [2, 4, 6, 8, 10];
 }
 
 sub test_each_cons {
@@ -328,6 +348,26 @@ sub test_is_none {
 }
 
 sub test_is_one {
+}
+
+sub test_some : Test(2) {
+	is E(2, 5, 8, 1, 4)->some(sub {
+		$_ >= 10;
+	}), 0;
+
+	is E(12, 5, 8, 1, 4)->some(sub {
+		$_ >= 10;
+	}), 1;
+}
+
+sub test_every : Test(2) {
+	is E(12, 5, 8, 130, 44)->every(sub {
+		$_ >= 10;
+	}), 0;
+
+	is E(12, 54, 80, 130, 44)->every(sub {
+		$_ >= 10;
+	}), 1;
 }
 
 sub test_sum : Test {
