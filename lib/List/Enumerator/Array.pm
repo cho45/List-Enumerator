@@ -1,6 +1,8 @@
 package List::Enumerator::Array;
 use Moose;
 use overload
+	'<<'  => \&push,
+	'+'   => \&add,
 	'@{}' => \&to_a,
 	fallback => 1;
 
@@ -33,6 +35,7 @@ sub to_a {
 	my ($self) = @_;
 	$self->array;
 }
+*as_list = \&to_a;
 
 sub to_list {
 	my ($self) = @_;
@@ -43,6 +46,12 @@ sub push {
 	my ($self, @args) = @_;
 	CORE::push @{$self->array}, @args;
 	$self;
+}
+
+sub add {
+	my ($self, $array, $bool) = @_;
+	$bool ? [ @$array, @{$self->array} ]
+	      : [ @{$self->array}, @$array ];
 }
 
 sub unshift {
@@ -72,6 +81,51 @@ sub shift {
 sub pop {
 	my ($self) = @_;
 	CORE::pop @{$self->array};
+}
+
+sub delete {
+	my ($self, $target, $block) = @_;
+	my $ret = [];
+	for (0 .. $#{$self->array}) {
+		my $item = CORE::shift @{$self->array};
+		if ($item eq $target) {
+			CORE::push @$ret, $self->array->[$_];
+		} else {
+			CORE::push @{$self->array}, $item;
+		}
+	}
+	@$ret ? $target
+	      : ref($block) eq "CODE" ? $block->(local $_ = $target)
+	                              : undef;
+}
+
+sub delete_if {
+	my ($self, $block) = @_;
+	my $ret = [];
+	for my $index (0 .. $#{$self->array}) {
+		my $item = CORE::shift @{$self->array};
+		if ($block->(local $_ = $item)) {
+			CORE::push @$ret, $item;
+		} else {
+			CORE::push @{$self->array}, $item;
+		}
+	}
+	wantarray? @$ret : List::Enumerator::Array->new(array => $ret);
+}
+
+sub delete_at {
+	my ($self, $index) = @_;
+	return if $index > $#{$self->array};
+	my $ret;
+	for (0 .. $#{$self->array}) {
+		my $item = CORE::shift @{$self->array};
+		if ($_ == $index) {
+			$ret = $item;
+		} else {
+			CORE::push @{$self->array}, $item;
+		}
+	}
+	$ret;
 }
 
 __PACKAGE__->meta->make_immutable;

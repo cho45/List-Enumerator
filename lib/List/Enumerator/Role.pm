@@ -555,6 +555,25 @@ sub each {
 }
 *to_list = \&each;
 
+sub each_index {
+	my ($self, $block) = @_;
+	$self->rewind;
+
+	my $i = 0;
+	eval {
+		while (1) {
+			$self->next;
+			local $_ = $i++;
+			$block->($_) if $block;
+		}
+	}; if (Exception::Class->caught("StopIteration") ) { } else {
+		my $e = Exception::Class->caught();
+		ref $e ? $e->rethrow : die $e if $e;
+	}
+
+	wantarray? $self->to_list : $self;
+}
+
 sub to_a {
 	my ($self) = @_;
 	[ $self->each ];
@@ -565,6 +584,12 @@ sub expand {
 	List::Enumerator::Array->new(array => $self->to_a);
 }
 *dup = \&expand;
+
+sub dump {
+	my ($self) = @_;
+	require Data::Dumper;
+	Data::Dumper->new([ $self->to_a ])->Purity(1)->Terse(1)->Dump;
+}
 
 sub rewind {
 	die "Not implemented.";
