@@ -339,7 +339,7 @@ sub test_each_cons : Test(3) {
 
 	$result = [];
 	E(1, 2, 3, 4, 5)->each_cons(2, sub {
-		push @$result, [ @_ ];
+		push @$result, $_;
 	});
 	is_deeply $result, [
 		[1, 2],
@@ -350,7 +350,7 @@ sub test_each_cons : Test(3) {
 
 	$result = [];
 	E(1, 2, 3, 4, 5)->each_cons(3, sub {
-		push @$result, [ @_ ];
+		push @$result, $_;
 	});
 	is_deeply $result, [
 		[1, 2, 3],
@@ -393,17 +393,17 @@ sub test_each_slice : Test(3) {
 
 	$result = [];
 	E(1, 2, 3, 4, 5)->each_slice(2, sub {
-		push @$result, [ @_ ];
+		push @$result, $_;
 	});
 	is_deeply $result, [
 		[1, 2],
-		[2, 4],
+		[3, 4],
 		[5]
 	];
 
 	$result = [];
-	E(1)->(10)->each_slice(3, sub {
-		push @$result, [ @_ ];
+	E(1..10)->each_slice(3, sub {
+		push @$result, $_;
 	});
 	is_deeply $result, [
 		[1, 2, 3],
@@ -432,8 +432,8 @@ sub test_minmax : Test(4) {
 	is $max, 3;
 
 	($min, $max) = E([{ n => 1 }, { n => 2 }, { n => 3 }])->minmax_by(sub { $_->{n} });
-	is $min, 1;
-	is $max, 3;
+	is_deeply $min, { n => 1 };
+	is_deeply $max, { n => 3 };
 }
 
 sub test_is_none : Test(6) {

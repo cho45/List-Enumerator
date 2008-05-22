@@ -116,6 +116,19 @@ sub find {
 	$ret;
 }
 
+sub find_index {
+	my ($self, $target) = @_;
+	my $block = ref($target) eq "CODE" ? $target : sub { $_ eq $target };
+	my $ret = 0;
+	$self->each(sub {
+		if ($block->($self)) {
+			$self->stop;
+		}
+		$ret++;
+	});
+	$ret;
+}
+
 sub first {
 	my ($self) = @_;
 	$self->rewind;
@@ -149,9 +162,17 @@ sub min_by {
 	$self->sort_by($block)->first;
 }
 
+sub minmax_by {
+	my ($self, $block) = @_;
+	$block = sub { $_ } unless $block;
+	my @ret = $self->sort_by($block)->to_list;
+	($ret[0], $ret[$#ret]);
+}
+*minmax = \&minmax_by;
+
 sub sort_by {
 	my ($self, $block) = @_;
-	List::Enumerator::E(
+	List::Enumerator::E([
 		map {
 			$_->[0];
 		}
@@ -162,7 +183,7 @@ sub sort_by {
 			[$_, $block->($_)];
 		}
 		$self->to_list
-	);
+	]);
 }
 
 sub sort {
@@ -384,6 +405,34 @@ sub some {
 }
 *any = \&some;
 
+
+sub none {
+	my ($self, $block) = @_;
+	$block = sub { $_ } unless $block;
+
+	for ($self->to_list) {
+		return 0 if $block->($_);
+	}
+	return 1;
+}
+
+sub one {
+	my ($self, $block) = @_;
+	$block = sub { $_ } unless $block;
+
+	my $ret = 0;
+	for ($self->to_list) {
+		if ($block->($_)) {
+			if ($ret) {
+				return 0;
+			} else {
+				$ret = 1;
+			}
+		}
+	}
+	return $ret;
+}
+
 sub zip {
 	my ($self, @others) = @_;
 	$self->rewind;
@@ -572,6 +621,62 @@ sub each_index {
 	}
 
 	wantarray? $self->to_list : $self;
+}
+
+sub each_slice {
+	my ($self, $n, $block) = @_;
+	$self->rewind;
+
+	my $ret = List::Enumerator::Sub->new({
+		next => sub {
+			my $arg = [];
+			my $i   = $n - 1;
+			push @$arg, $self->next;
+			while ($i--) {
+				eval {
+					push @$arg, $self->next;
+				}; if (Exception::Class->caught("StopIteration") ) { } else {
+					my $e = Exception::Class->caught();
+					ref $e ? $e->rethrow : die $e if $e;
+				}
+			}
+			$arg;
+		},
+		rewind => sub {
+			$self->rewind;
+		}
+	});
+	if ($block) {
+		$ret->each($block);
+	}
+	wantarray? $ret->to_list : $ret;
+}
+
+sub each_cons {
+	my ($self, $n, $block) = @_;
+	$self->rewind;
+
+	my @memo = ();
+	my $ret = List::Enumerator::Sub->new({
+		next => sub {
+			if (@memo < $n) {
+				my $i = $n;
+				push @memo, $self->next while $i--;
+			} else {
+				shift @memo;
+				push @memo, $self->next;
+			}
+			[ @memo ];
+		},
+		rewind => sub {
+			$self->rewind;
+			@memo = ();
+		}
+	});
+	if ($block) {
+		$ret->each($block);
+	}
+	wantarray? $ret->to_list : $ret;
 }
 
 sub to_a {
