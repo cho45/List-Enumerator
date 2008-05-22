@@ -104,7 +104,8 @@ sub slice {
 };
 
 sub find {
-	my ($self, $block) = @_;
+	my ($self, $target) = @_;
+	my $block = ref($target) eq "CODE" ? $target : sub { $_ eq $target };
 	my $ret;
 	$self->each(sub {
 		if ($block->($self)) {
@@ -230,13 +231,13 @@ sub index_of {
 	my ($self, $target) = @_;
 	$self->rewind;
 
-	my $code = ref($target) eq "CODE" ? $target : sub { $_ eq $target };
+	my $block = ref($target) eq "CODE" ? $target : sub { $_ eq $target };
 
 	my $ret = 0;
 	return eval {
 		while (1) {
 			my $item = $self->next;
-			return $ret if $code->(local $_ = $item);
+			return $ret if $block->(local $_ = $item);
 			$ret++;
 		}
 	}; if (Exception::Class->caught("StopIteration") ) { } else {
