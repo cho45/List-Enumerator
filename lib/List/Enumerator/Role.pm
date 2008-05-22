@@ -6,6 +6,7 @@ use List::Util;
 use List::MoreUtils;
 
 requires "next";
+requires "rewind";
 
 has "is_beginning" => ( is => "rw", isa => "Bool", default => sub { 1 } );
 
@@ -166,7 +167,7 @@ sub minmax_by {
 	my ($self, $block) = @_;
 	$block = sub { $_ } unless $block;
 	my @ret = $self->sort_by($block)->to_list;
-	($ret[0], $ret[$#ret]);
+	wantarray? ($ret[0], $ret[$#ret]) : [ $ret[0], $ret[$#ret] ];
 }
 *minmax = \&minmax_by;
 

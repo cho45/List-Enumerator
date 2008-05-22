@@ -1,4 +1,9 @@
 Revision history for Perl extension List::Enumerator
 
+0.02 Thu May 22 22:56:06 2008
+	* append some methods.
+	* fixed silly 'select' bug.
+	* fixed bug around rewind.
+
 0.01 Sat May 17 01:06:38 2008
 	* original version
