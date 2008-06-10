@@ -128,6 +128,27 @@ sub delete_at {
 	$ret;
 }
 
+# for performance
+sub each {
+	my ($self, $block) = @_;
+	$self->rewind;
+	my @ret;
+
+	if ($block) {
+		for (@{ $self->array }) {
+			local $_ = $_;
+			$block->($_);
+			CORE::push @ret, $_;
+		}
+	} else {
+		for (@{ $self->array }) {
+			CORE::push @ret, $_;
+		}
+	}
+
+	wantarray? @ret : $self;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
