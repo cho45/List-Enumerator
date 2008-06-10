@@ -20,7 +20,6 @@ use Benchmark qw/:all/;
 
 
 say "Simple Loop:";
-
 cmpthese(10000, {
 	'List::Enumerator' => sub {
 		my $list = [1..100];
@@ -42,4 +41,28 @@ cmpthese(10000, {
 		for (@$list) {
 		}
 	}
+});
+
+say;
+
+say "Map:";
+cmpthese(10000, {
+	'List::Enumerator' => sub {
+		my $list = [1..100];
+		[ E($list)->map(sub {
+			$_ * $_;
+		}) ];
+	},
+	'List::oo' => sub {
+		my $list = [1..100];
+		L(@$list)->map(sub {
+			$_ * $_;
+		});
+	},
+	'autobox::Core' => sub {
+		my $list = [1..100];
+		$list->map(sub {
+			$_ * $_;
+		});
+	},
 });

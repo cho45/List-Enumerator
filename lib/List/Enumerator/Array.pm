@@ -135,12 +135,22 @@ sub each {
 	my @ret;
 
 	if ($block) {
-		@ret = CORE::map({ $block->(local $_ = $_) } @{ $self->array });
+		@ret = CORE::map({ $block->(local $_ = $_); $_; } @{ $self->array });
 	} else {
 		@ret = @{ $self->array };
 	}
 
 	wantarray? @ret : $self;
+}
+
+sub map {
+	my ($self, $block) = @_;
+	$self->rewind;
+	my @ret;
+
+	@ret = CORE::map({ $block->(local $_ = $_) } @{ $self->array });
+
+	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
 }
 
 __PACKAGE__->meta->make_immutable;
