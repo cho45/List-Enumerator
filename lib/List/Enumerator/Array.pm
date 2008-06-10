@@ -135,15 +135,9 @@ sub each {
 	my @ret;
 
 	if ($block) {
-		for (@{ $self->array }) {
-			local $_ = $_;
-			$block->($_);
-			CORE::push @ret, $_;
-		}
+		@ret = CORE::map({ $block->(local $_ = $_) } @{ $self->array });
 	} else {
-		for (@{ $self->array }) {
-			CORE::push @ret, $_;
-		}
+		@ret = @{ $self->array };
 	}
 
 	wantarray? @ret : $self;
