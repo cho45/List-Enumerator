@@ -135,7 +135,15 @@ sub each {
 	my @ret;
 
 	if ($block) {
-		@ret = CORE::map({ $block->(local $_ = $_); $_; } @{ $self->array });
+		eval {
+			for (@{ $self->array }) {
+				$block->(local $_ = $_);
+				CORE::push @ret, $_;
+			}
+		}; if (Exception::Class->caught("StopIteration") ) { } else {
+			my $e = Exception::Class->caught();
+			ref $e ? $e->rethrow : die $e if $e;
+		}
 	} else {
 		@ret = @{ $self->array };
 	}
