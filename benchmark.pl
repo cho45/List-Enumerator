@@ -65,4 +65,11 @@ cmpthese(10000, {
 			$_ * $_;
 		});
 	},
+	'for' => sub {
+		my $list = [1..100];
+		my $ret = [];
+		for (@$list) {
+			push @$ret, $_ * $_;
+		}
+	},
 });
