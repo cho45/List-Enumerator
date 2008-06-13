@@ -1,5 +1,10 @@
 Revision history for Perl extension List::Enumerator
 
+0.03 Sat Jun 14 04:05:55 2008
+	* more faster each method.
+	* changed interface of each.
+	  now each method always returns self.
+
 0.02 Thu May 22 22:56:06 2008
 	* append some methods.
 	* fixed silly 'select' bug.

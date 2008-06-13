@@ -5,7 +5,7 @@ use Sub::Exporter -setup => { exports => [ "E" ] };
 use List::Enumerator::Array;
 use List::Enumerator::Sub;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub E {
 	my (@args) = @_;
