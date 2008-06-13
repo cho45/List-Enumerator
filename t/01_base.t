@@ -12,7 +12,7 @@ use List::Enumerator::Sub;
 use Data::Dumper;
 sub p ($) { warn Dumper shift }
 
-sub test_each : Test(6) {
+sub test_each : Test(3) {
 	my $result = [];
 
 	E(1, 2, 3)->each(sub {
@@ -32,12 +32,15 @@ sub test_each : Test(6) {
 		push @$result, $_;
 	});
 	is_deeply $result, [1, 2, 3];
-	is_deeply [ E(1, 2, 3)->each ], [1, 2, 3];
+}
+
+sub test_to_list : Test(3) {
+	is_deeply [ E(1, 2, 3)->to_list ], [1, 2, 3];
 
 	my $list = E(1, 2, 3);
 	$list->next;
-	is_deeply [ $list->each ], [1, 2, 3];
-	is_deeply [ $list->each ], [1, 2, 3];
+	is_deeply [ $list->to_list ], [1, 2, 3];
+	is_deeply [ $list->to_list ], [1, 2, 3];
 }
 
 

@@ -45,6 +45,31 @@ cmpthese(10000, {
 
 say;
 
+say "Simple Loop (exclude object construction):";
+my $list_enumerator = E(1..100);
+my $list_oo         = L(1..100);
+my $list            = [1..100];
+cmpthese(10000, {
+	'List::Enumerator' => sub {
+		$list_enumerator->each(sub {
+		});
+	},
+	'List::oo' => sub {
+		$list_oo->map(sub {
+		});
+	},
+	'autobox::Core' => sub {
+		$list->each(sub {
+		});
+	},
+	'for' => sub {
+		for (@$list) {
+		}
+	}
+});
+
+say;
+
 say "Map:";
 cmpthese(10000, {
 	'List::Enumerator' => sub {

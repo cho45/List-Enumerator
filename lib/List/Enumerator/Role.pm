@@ -589,11 +589,9 @@ sub each {
 	my ($self, $block) = @_;
 	$self->rewind;
 
-	my @ret;
 	eval {
 		while (1) {
 			local $_ = $self->next;
-			push @ret, $_;
 			$block->($_) if $block;
 		}
 	}; if (Exception::Class->caught("StopIteration") ) { } else {
@@ -601,9 +599,19 @@ sub each {
 		ref $e ? $e->rethrow : die $e if $e;
 	}
 
-	wantarray? @ret : $self;
+	$self;
 }
-*to_list = \&each;
+
+sub to_list {
+	my ($self) = @_;
+
+	my @ret = ();
+	$self->each(sub {
+		push @ret, $_;
+	});
+
+	wantarray? @ret : [ @ret ];
+}
 
 sub each_index {
 	my ($self, $block) = @_;
@@ -682,7 +690,7 @@ sub each_cons {
 
 sub to_a {
 	my ($self) = @_;
-	[ $self->each ];
+	[ $self->to_list ];
 }
 
 sub expand {

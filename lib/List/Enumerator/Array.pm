@@ -132,23 +132,19 @@ sub delete_at {
 sub each {
 	my ($self, $block) = @_;
 	$self->rewind;
-	my @ret;
 
 	if ($block) {
 		eval {
 			for (@{ $self->array }) {
 				$block->(local $_ = $_);
-				CORE::push @ret, $_;
 			}
 		}; if (Exception::Class->caught("StopIteration") ) { } else {
 			my $e = Exception::Class->caught();
 			ref $e ? $e->rethrow : die $e if $e;
 		}
-	} else {
-		@ret = @{ $self->array };
 	}
 
-	wantarray? @ret : $self;
+	$self;
 }
 
 sub map {
