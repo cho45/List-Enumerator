@@ -117,19 +117,6 @@ sub find {
 	$ret;
 }
 
-sub find_index {
-	my ($self, $target) = @_;
-	my $block = ref($target) eq "CODE" ? $target : sub { $_ eq $target };
-	my $ret = 0;
-	$self->each(sub {
-		if ($block->($self)) {
-			$self->stop;
-		}
-		$ret++;
-	});
-	$ret;
-}
-
 sub first {
 	my ($self) = @_;
 	$self->rewind;
@@ -269,6 +256,8 @@ sub index_of {
 
 	undef;
 }
+*find_index = \&index_of;
+
 
 sub chain {
 	my ($self, @others) = @_;

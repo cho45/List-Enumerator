@@ -422,9 +422,10 @@ sub test_each_slice : Test(3) {
 	];
 }
 
-sub test_find_index : Test(2) {
+sub test_find_index : Test(3) {
 	is E(qw/a b c/)->find_index("a"), 0;
 	is E(qw/a b c/)->find_index("c"), 2;
+	is E(qw/a b c/)->find_index("d"), undef;
 }
 
 sub test_minmax : Test(4) {
