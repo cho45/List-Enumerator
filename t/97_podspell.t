@@ -9,3 +9,5 @@ __DATA__
 cho45
 List::Enumerator
 github
+StopIteration
+uniq
