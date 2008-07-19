@@ -87,6 +87,284 @@ Returns List::Enumerator::Sub. ex:
   [ fibonacci->take(10) ];           #=> [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
   [ fibonacci->drop(10)->take(10) ]; #=> [ 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181 ];
 
+=item next
+
+Returns next element of receiver. The modules which use List::Enumerator::Role must define this method.
+
+=item rewind
+
+Rewinds receiver. The modules which use List::Enumerator::Role must define this method.
+
+=item select(sub {}), find_all(sub {})
+
+Selects all elements which is evaluated true with block. find_all is just alias to select.
+
+  E(1..10)->select(sub {
+      $_ % 2 == 0 
+  })->to_a; #=> [2, 4, 6, 8, 10];
+
+
+=item reject(sub {})
+
+Selects all elements which is evaluated false with block. This is antonym of select.
+
+
+=item reduce(sub {}), inject(sub {})
+
+Reduces receiver to one value using block.
+
+  E(1..3)->reduce(sub { $a + $b }); #=> 6
+
+
+=item slice($start, $end)
+
+Slices receiver with $start and $end.
+
+  E(1..10)->slice(0);  #=> 1
+  E(1..10)->slice(-1); #=> 10
+
+  E(1..20)->slice(9, 11)->to_a; #=> [10, 11, 12]
+
+
+=item find($target)
+
+Finds $target. If the value is found returns it. If not so returns undef.
+
+
+=item find_index($target), index_of($target)
+
+Finds $target and returns its index.
+
+
+=item first
+
+Returns first element of receiver.
+
+=item last
+
+Returns last element of receiver.
+
+=item max
+
+Returns max value of receiver.
+
+=item max_by(sub {})
+
+Returns max value of receiver with block.
+
+=item min
+
+Returns min value of receiver.
+
+=item min_by(sub {})
+
+Returns min value of receiver with block.
+
+=item minmax_by(sub {})
+
+Returns min value and max value of receiver with block.
+
+=item sort_by(sub {})
+
+Returns sorted list with returned value from block. (Schwartzian transformed sort)
+
+=item sort(sub {})
+
+Returns sorted list with block.
+
+=item sum
+
+Sums receiver up and returns the value.
+
+=item uniq
+
+Returns new unique list.
+
+=item grep(sub {})
+
+Grep receiver and returns new list.
+
+  [ E(1..10)->grep(sub { $_ % 2 == 0 }) ]; #=> [2, 4, 6, 8, 10];
+
+
+=item compact
+
+Returns new list excludes undef.
+
+=item reverse
+
+Returns new reversed list of receiver.
+
+=item flatten($level)
+
+Expands nested array.
+
+	[ E([1, 2, [3, 4], 5])->flatten ];      #=> [1, 2, 3, 4, 5];
+	[ E([1, [2, [3, 4]], 5])->flatten ];    #=> [1, 2, 3, 4, 5];
+	[ E([1, [2, [3, 4]], 5])->flatten(1) ]; #=> [1, 2, [3, 4], 5];
+
+=item length, size
+
+Returns length of receiver. You should not call this method for infinite list.
+
+=item is_empty
+
+This is synonym of !$self->length;
+ 
+=item  chain(list...);
+
+Chains with other lists.
+
+  [ E(1, 2, 3)->chain([4, 5, 6]) ]; #=> [1, 2, 3, 4, 5, 6];
+
+=item take(sub {}), take(number), take_while(sub {})
+
+Returns prefix of receiver of length number or elements satisfy block.
+
+=item drop(sub {}), drop(number), drop_while(sub {})
+
+Returns remaining of receiver.
+
+=item every(sub {}), all(sub {})
+
+Returns 1 if all elements in receiver satisfies the block.
+
+=item some(sub {}), any(sub {})
+
+Returns 1 if at least one element in receiver satisfies the block.
+
+=item none(sub {})
+
+Returns 1 if all elements in receiver not satisfies the block.
+
+  E(0, 0, 0, 0)->none; #=> 1
+  E(0, 0, 0, 1)->none; #=> 0
+  E(0, 0, 1, 1)->none; #=> 0
+
+=item one(sub {})
+
+Returns 1 if just one elements in receiver satisfies the block.
+
+  E(0, 0, 0, 0)->one; #=> 0
+  E(0, 0, 0, 1)->one; #=> 1
+  E(0, 0, 1, 1)->one; #=> 0
+
+=item zip(list..)
+
+Returns zipped list with arguments. The length of returned list is length of receiver.
+
+  [ E(1..3)->zip([qw/a b c/]) ]; #=> [ [1, "a"], [2, "b"], [3, "c"] ]
+
+
+=item with_index
+
+Returns zipped with count.
+
+  E("a", "b", "c")->with_index->each(sub {
+  	my ($item, $index) = @$_;
+  });
+
+=item countup($lim), to($lim)
+
+Returns count up list starts from first of receiver.
+If $lim is not supplied, this returns infinite list.
+
+  E(1)->countup; #=> List::Enumerator::Sub
+  [ E(1)->countup->take(3) ]; #=>  [1, 2, 3]
+
+  E(1)->to(100); #=> E(1..100)
+
+=item cycle
+
+Returns infinite list which cycles receiver.
+
+  [ E(1, 2, 3)->cycle->take(5) ]; #=> [1, 2, 3, 1, 2]
+
+=item join($sep)
+
+Returns string of receiver joined with $sep
+
+=item group_by(sub {})
+
+Returns a hash reference group by the block.
+
+  E([
+  	{ cat => 'a' }, { cat => 'a' },{ cat => 'a' },{ cat => 'a' },
+  	{ cat => 'b' }, { cat => 'b' },{ cat => 'b' },{ cat => 'b' },
+  	{ cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' },
+  ])->group_by(sub {
+  	$_->{cat};
+  });
+  
+  {
+  	'a' => [ { cat => 'a' }, { cat => 'a' },{ cat => 'a' },{ cat => 'a' } ],
+  	'b' => [ { cat => 'b' }, { cat => 'b' },{ cat => 'b' },{ cat => 'b' } ],
+  	'c' => [ { cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' } ],
+  };
+
+=item partition(sub {})
+
+  my ($even, $odd) = E(1..10)->partition(sub { $_ % 2 == 0 });
+
+=item include($target), is_include($target)
+
+=item map(sub {}), collect(sub {})
+
+=item each(sub {})
+
+=item each_index
+
+=item each_slice($n, sub {})
+
+  E(1)->countup->each_slice(3)->take(3)->to_a;
+  
+  [
+  	[1, 2, 3],
+  	[4, 5, 6],
+  	[7, 8, 9],
+  ];
+
+=item each_cons($n, sub {})
+
+  E(1)->countup->each_cons(3)->take(3)->to_a;
+  
+  [
+  	[1, 2, 3],
+  	[2, 3, 4],
+  	[3, 4, 5]
+  ];
+
+=item to_list
+
+Returns expanded array or array reference.
+
+  E(1)->countup->take(5)->to_list;     #=> [1, 2, 3, 4, 5]
+  [ E(1)->countup->take(5)->to_list ]; #=> [1, 2, 3, 4, 5]
+
+=item to_a
+
+Returns expanded array reference.
+
+  E(1)->countup->take(5)->to_a;     #=> [1, 2, 3, 4, 5]
+  [ E(1)->countup->take(5)->to_a ]; #=> [ [1, 2, 3, 4, 5] ]
+
+=item expand
+
+Returns new List::Enumerator::Array with expanded receiver.
+
+=item dump
+
+=item stop
+
+Throw StopIteration exception.
+
+  my $list = E({
+  	next => sub {
+  		$_->stop;
+  	}
+  });
+
+  $list->to_a; #=> [];
 
 =back
 
