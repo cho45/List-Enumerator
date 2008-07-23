@@ -100,7 +100,7 @@ Rewinds receiver. The modules which use List::Enumerator::Role must define this 
 Selects all elements which is evaluated true with block. find_all is just alias to select.
 
   E(1..10)->select(sub {
-      $_ % 2 == 0 
+      $_ % 2 == 0
   })->to_a; #=> [2, 4, 6, 8, 10];
 
 
@@ -210,7 +210,7 @@ Returns length of receiver. You should not call this method for infinite list.
 =item is_empty
 
 This is synonym of !$self->length;
- 
+
 =item  chain(list...);
 
 Chains with other lists.
