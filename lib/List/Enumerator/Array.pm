@@ -1,17 +1,22 @@
 package List::Enumerator::Array;
-use Moose;
+use base qw/List::Enumerator::Role/;
 use overload
 	'<<'  => \&push,
 	'+'   => \&add,
 	'@{}' => \&to_a,
 	fallback => 1;
 
-with "List::Enumerator::Role";
+no warnings 'once';
 
-has "array" => ( is => "ro", isa => "ArrayRef", default => sub { [] } );
-has "index" => ( is => "rw", isa => "Int", default => sub { 0 } );
+__PACKAGE__->mk_accessors(qw/array index/);
 
-sub next {
+sub BUILD {
+	my ($self) = @_;
+	$self->array([]) unless $self->array;
+	$self->index(0);
+}
+
+sub _next {
 	my ($self) = @_;
 
 	my $i = $self->index;
@@ -24,7 +29,7 @@ sub next {
 	}
 }
 
-sub rewind {
+sub _rewind {
 	my ($self) = @_;
 
 	$self->index(0);
@@ -133,6 +138,7 @@ sub each {
 	my ($self, $block) = @_;
 	$self->rewind;
 
+
 	if ($block) {
 		eval {
 			for (@{ $self->array }) {
@@ -157,7 +163,6 @@ sub map {
 	wantarray? @ret : List::Enumerator::Array->new(array => \@ret);
 }
 
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__

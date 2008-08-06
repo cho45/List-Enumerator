@@ -1,43 +1,30 @@
 package List::Enumerator::Sub;
-use Moose;
+use base qw/List::Enumerator::Role/;
 use overload
 	'@{}' => \&getarray;
 
-with "List::Enumerator::Role";
-
-has "next_sub"   => ( is => "rw", isa => "CodeRef" );
-has "rewind_sub" => ( is => "rw", isa => "CodeRef", default => sub { sub {} });
+__PACKAGE__->mk_accessors(qw/next_sub rewind_sub/);
 
 sub BUILD {
 	my ($self, $params) = @_;
-
+	
 	$self->next_sub($params->{next});
-	$self->rewind_sub($params->{rewind}) if $params->{rewind};
+	$self->rewind_sub($params->{rewind} || sub {});
 }
 
-sub next {
+sub _next {
 	my ($self, $new) = @_;
 
-	if ($new) {
-		$self->next_sub($new);
-		$self;
-	} else {
-		local $_ = $self;
-		$self->next_sub->($self);
-	}
+	local $_ = $self;
+	$self->next_sub->($self);
 }
 
-sub rewind {
+sub _rewind {
 	my ($self, $new) = @_;
 
-	if ($new) {
-		$self->rewind_sub($new);
-		$self;
-	} else {
-		local $_ = $self;
-		$self->rewind_sub->();
-		$self;
-	}
+	local $_ = $self;
+	$self->rewind_sub->($self);
+	$self;
 }
 
 sub getarray {
@@ -62,8 +49,6 @@ sub FETCH { #TODO orz orz orz
 	$self->next while ($index--);
 	$self->next;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__

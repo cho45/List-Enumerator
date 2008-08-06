@@ -1,31 +1,37 @@
 package List::Enumerator::Role;
-use Moose::Role;
 use Exception::Class ( "StopIteration" );
 
 use List::Util;
 use List::MoreUtils;
+use base qw/Class::Accessor::Fast/;
+no warnings 'once';
 
-requires "next";
-requires "rewind";
+__PACKAGE__->mk_accessors(qw/is_beginning/);
 
-has "is_beginning" => ( is => "rw", isa => "Bool", default => sub { 1 } );
+# this is mix-in module
 
-around "next" => sub {
-	my $next = shift;
-	my ($self, @args) = @_;
+sub new {
+	my ($class, %opts) = @_;
+	my $self = $class->SUPER::new(\%opts);
+	$self->can("BUILD") && $self->BUILD(\%opts);
+	$self->is_beginning(1);
+	$self;
+}
+
+sub next {
+	my ($self) = @_;
 	$self->is_beginning(0);
-	$next->($self, @args);
-};
+	$self->_next();
+}
 
-around "rewind" => sub {
-	my $next = shift;
-	my ($self, @args) = @_;
+sub rewind {
+	my ($self) = @_;
 	unless ($self->is_beginning) {
-		$next->($self, @args);
+		$self->_rewind();
 		$self->is_beginning(1);
 	}
 	$self;
-};
+}
 
 sub select {
 	my ($self, $block) = @_;
@@ -375,7 +381,7 @@ sub drop {
 	}
 	wantarray? $ret->to_list : $ret;
 }
-*drop_while = \&drop_while;
+*drop_while = \&drop;
 
 sub every {
 	my ($self, $block) = @_;
@@ -433,6 +439,7 @@ sub zip {
 		}
 		@others
 	];
+
 	my @cache = ();
 	my $ret = List::Enumerator::Sub->new(
 		next => sub {
@@ -455,14 +462,14 @@ sub zip {
 		},
 		rewind => sub {
 			my $i = 0;
-			$_->next(sub {
+			$_->next_sub(sub {
 				if ($i < @cache) {
 					$cache[$i++];
 				} else {
 					StopIteration->throw;
 				}
 			});
-			$_->rewind(sub {
+			$_->rewind_sub(sub {
 				$i = 0;
 			});
 		}
@@ -480,7 +487,7 @@ sub countup {
 	my ($self, $lim) = @_;
 	my $start = eval { $self->next } || 0;
 	my $i = $start;
-	List::Enumerator::Sub->new({
+	List::Enumerator::Sub->new(
 		next => sub {
 			($lim && $i > $lim) && StopIteration->throw;
 			$i++;
@@ -488,7 +495,7 @@ sub countup {
 		rewind => sub {
 			$i = $start;
 		}
-	});
+	);
 }
 *countup_to = \&countup;
 *to = \&countup;
@@ -499,7 +506,7 @@ sub cycle {
 	$self->rewind;
 
 	my @cache = ();
-	List::Enumerator::Sub->new({
+	List::Enumerator::Sub->new(
 		next => sub {
 			my ($this) = @_;
 
@@ -509,7 +516,7 @@ sub cycle {
 				push @cache, $ret;
 			}; if (Exception::Class->caught("StopIteration") ) {
 				my $i = -1;
-				$this->next(sub {
+				$this->next_sub(sub {
 					$cache[++$i % @cache];
 				});
 				$ret = $this->next;
@@ -523,7 +530,7 @@ sub cycle {
 			$self->rewind;
 			@cache = ();
 		}
-	});
+	);
 }
 
 sub join {
@@ -561,7 +568,7 @@ sub map {
 	my ($self, $block) = @_;
 	$self->rewind;
 
-	my $ret = List::Enumerator::Sub->new({
+	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			local $_ = $self->next;
 			$block->($_);
@@ -569,7 +576,7 @@ sub map {
 		rewind => sub {
 			$self->rewind;
 		}
-	});
+	);
 	wantarray? $ret->to_list : $ret;
 }
 *collect = \&map;
@@ -625,7 +632,7 @@ sub each_slice {
 	my ($self, $n, $block) = @_;
 	$self->rewind;
 
-	my $ret = List::Enumerator::Sub->new({
+	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			my $arg = [];
 			my $i   = $n - 1;
@@ -643,7 +650,7 @@ sub each_slice {
 		rewind => sub {
 			$self->rewind;
 		}
-	});
+	);
 	if ($block) {
 		$ret->each($block);
 	}
@@ -655,7 +662,7 @@ sub each_cons {
 	$self->rewind;
 
 	my @memo = ();
-	my $ret = List::Enumerator::Sub->new({
+	my $ret = List::Enumerator::Sub->new(
 		next => sub {
 			if (@memo < $n) {
 				my $i = $n;
@@ -670,7 +677,7 @@ sub each_cons {
 			$self->rewind;
 			@memo = ();
 		}
-	});
+	);
 	if ($block) {
 		$ret->each($block);
 	}
@@ -694,7 +701,12 @@ sub dump {
 	Data::Dumper->new([ $self->to_a ])->Purity(1)->Terse(1)->Dump;
 }
 
-sub rewind {
+
+sub _next {
+	die "Not implemented.";
+}
+
+sub _rewind {
 	die "Not implemented.";
 }
 
