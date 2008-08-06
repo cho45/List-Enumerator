@@ -1,5 +1,4 @@
 package List::Enumerator;
-use Moose;
 use Sub::Exporter -setup => { exports => [ "E" ] };
 
 use List::Enumerator::Array;
@@ -379,7 +378,7 @@ Throw StopIteration exception.
 
 =item * Read the context
 
-=item * Applicable (implemented as Moose::Role)
+=item * Applicable
 
 =back
 
