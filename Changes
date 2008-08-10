@@ -3,6 +3,7 @@ Revision history for Perl extension List::Enumerator
 0.04 Sun Aug 10 
 	* Use Class::Accessor::Fast instead of Moose.
 	* List::Enumerator::Role is just a class now.
+	* E is exported by default.
 
 0.03 Sat Jun 14 04:05:55 2008
 	* more faster each method.

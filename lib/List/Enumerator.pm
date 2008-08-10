@@ -1,5 +1,10 @@
 package List::Enumerator;
-use Sub::Exporter -setup => { exports => [ "E" ] };
+use Sub::Exporter -setup => {
+	exports => [ "E" ],
+	groups  => {
+		default => [ "E" ],
+	}
+};
 
 use List::Enumerator::Array;
 use List::Enumerator::Sub;
