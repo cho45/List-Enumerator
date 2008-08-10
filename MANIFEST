@@ -24,6 +24,9 @@ lib/List/Enumerator/Sub.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+pod.html
+pod2htmd.tmp
+pod2htmi.tmp
 Rakefile
 README
 t/00_compile.t
