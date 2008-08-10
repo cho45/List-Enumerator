@@ -69,7 +69,7 @@ Most methods (except what returns always infinite list) consider caller context.
 
 Returns List::Enumerator::Array.
 
-=item C<E({ next => sub {}, rewind => sub {} })>
+=item C<E({ next =E<gt> sub {}, rewind =E<gt> sub {} })>
 
 Returns List::Enumerator::Sub. ex:
 
@@ -316,7 +316,7 @@ Returns a hash reference group by the block.
 
 =item C<include($target)>, C<is_include($target)>
 
-  If receiver include $target this return true.
+If receiver include $target this return true.
 
 =item C<map(sub {})>, C<collect(sub {})>
 
