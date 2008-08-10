@@ -58,11 +58,13 @@ Most methods (except what returns always infinite list) consider caller context.
 
 =over
 
-=item E(list), E([arrayref])
+=item C<E(list)>
+
+=item C<E([arrayref])>
 
 Returns List::Enumerator::Array.
 
-=item E({ next => sub {}, rewind => sub {} })
+=item C<E({ next => sub {}, rewind => sub {} })>
 
 Returns List::Enumerator::Sub. ex:
 
@@ -86,15 +88,15 @@ Returns List::Enumerator::Sub. ex:
   [ fibonacci->take(10) ];           #=> [ 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 ];
   [ fibonacci->drop(10)->take(10) ]; #=> [ 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181 ];
 
-=item next
+=item C<next>
 
-Returns next element of receiver. The modules which use List::Enumerator::Role must define this method.
+Returns next element of receiver.
 
-=item rewind
+=item C<rewind>
 
-Rewinds receiver. The modules which use List::Enumerator::Role must define this method.
+Rewinds receiver.
 
-=item select(sub {}), find_all(sub {})
+=item C<select(sub {})>, C<find_all(sub {})>
 
 Selects all elements which is evaluated true with block. find_all is just alias to select.
 
@@ -103,19 +105,19 @@ Selects all elements which is evaluated true with block. find_all is just alias 
   })->to_a; #=> [2, 4, 6, 8, 10];
 
 
-=item reject(sub {})
+=item C<reject(sub {})>
 
 Selects all elements which is evaluated false with block. This is antonym of select.
 
 
-=item reduce(sub {}), inject(sub {})
+=item C<reduce(sub {})>, C<inject(sub {})>
 
 Reduces receiver to one value using block.
 
   E(1..3)->reduce(sub { $a + $b }); #=> 6
 
 
-=item slice($start, $end)
+=item C<slice($start, $end)>
 
 Slices receiver with $start and $end.
 
@@ -125,76 +127,76 @@ Slices receiver with $start and $end.
   E(1..20)->slice(9, 11)->to_a; #=> [10, 11, 12]
 
 
-=item find($target)
+=item C<find($target)>
 
 Finds $target. If the value is found returns it. If not so returns undef.
 
 
-=item find_index($target), index_of($target)
+=item C<find_index($target)>, C<index_of($target)>
 
 Finds $target and returns its index.
 
 
-=item first
+=item C<first>
 
 Returns first element of receiver.
 
-=item last
+=item C<last>
 
 Returns last element of receiver.
 
-=item max
+=item C<max>
 
 Returns max value of receiver.
 
-=item max_by(sub {})
+=item C<max_by(sub {})>
 
 Returns max value of receiver with block.
 
-=item min
+=item C<min>
 
 Returns min value of receiver.
 
-=item min_by(sub {})
+=item C<min_by(sub {})>
 
 Returns min value of receiver with block.
 
-=item minmax_by(sub {})
+=item C<minmax_by(sub {})>
 
 Returns min value and max value of receiver with block.
 
-=item sort_by(sub {})
+=item C<sort_by(sub {})>
 
 Returns sorted list with returned value from block. (Schwartzian transformed sort)
 
-=item sort(sub {})
+=item C<sort(sub {})>
 
 Returns sorted list with block.
 
-=item sum
+=item C<sum>
 
 Sums receiver up and returns the value.
 
-=item uniq
+=item C<uniq>
 
 Returns new unique list.
 
-=item grep(sub {})
+=item C<grep(sub {})>
 
 Grep receiver and returns new list.
 
   [ E(1..10)->grep(sub { $_ % 2 == 0 }) ]; #=> [2, 4, 6, 8, 10];
 
 
-=item compact
+=item C<compact>
 
 Returns new list excludes undef.
 
-=item reverse
+=item C<reverse>
 
 Returns new reversed list of receiver.
 
-=item flatten($level)
+=item C<flatten($level)>
 
 Expands nested array.
 
@@ -202,37 +204,38 @@ Expands nested array.
 	[ E([1, [2, [3, 4]], 5])->flatten ];    #=> [1, 2, 3, 4, 5];
 	[ E([1, [2, [3, 4]], 5])->flatten(1) ]; #=> [1, 2, [3, 4], 5];
 
-=item length, size
+=item C<length>, C<size>
 
 Returns length of receiver. You should not call this method for infinite list.
 
-=item is_empty
+=item C<is_empty>
 
 This is synonym of !$self->length;
 
-=item  chain(list...);
+=item C<chain(list...)>
 
 Chains with other lists.
 
   [ E(1, 2, 3)->chain([4, 5, 6]) ]; #=> [1, 2, 3, 4, 5, 6];
 
-=item take(sub {}), take(number), take_while(sub {})
+
+=item C<take(sub {})>, C<take(number)>, C<take_while(sub {})>
 
 Returns prefix of receiver of length number or elements satisfy block.
 
-=item drop(sub {}), drop(number), drop_while(sub {})
+=item C<drop(sub {})>, C<drop(number)>, C<drop_while(sub {})>
 
 Returns remaining of receiver.
 
-=item every(sub {}), all(sub {})
+=item C<every(sub {})>, C<all(sub {})>
 
 Returns 1 if all elements in receiver satisfies the block.
 
-=item some(sub {}), any(sub {})
+=item C<some(sub {})>, C<any(sub {})>
 
 Returns 1 if at least one element in receiver satisfies the block.
 
-=item none(sub {})
+=item C<none(sub {})>
 
 Returns 1 if all elements in receiver not satisfies the block.
 
@@ -240,7 +243,7 @@ Returns 1 if all elements in receiver not satisfies the block.
   E(0, 0, 0, 1)->none; #=> 0
   E(0, 0, 1, 1)->none; #=> 0
 
-=item one(sub {})
+=item C<one(sub {})>
 
 Returns 1 if just one elements in receiver satisfies the block.
 
@@ -248,14 +251,14 @@ Returns 1 if just one elements in receiver satisfies the block.
   E(0, 0, 0, 1)->one; #=> 1
   E(0, 0, 1, 1)->one; #=> 0
 
-=item zip(list..)
+=item C<zip(list..)>
 
 Returns zipped list with arguments. The length of returned list is length of receiver.
 
   [ E(1..3)->zip([qw/a b c/]) ]; #=> [ [1, "a"], [2, "b"], [3, "c"] ]
 
 
-=item with_index
+=item C<with_index>
 
 Returns zipped with count.
 
@@ -263,7 +266,8 @@ Returns zipped with count.
   	my ($item, $index) = @$_;
   });
 
-=item countup($lim), to($lim)
+
+=item C<countup($lim)>, C<to($lim)>
 
 Returns count up list starts from first of receiver.
 If $lim is not supplied, this returns infinite list.
@@ -273,17 +277,17 @@ If $lim is not supplied, this returns infinite list.
 
   E(1)->to(100); #=> E(1..100)
 
-=item cycle
+=item C<cycle>
 
 Returns infinite list which cycles receiver.
 
   [ E(1, 2, 3)->cycle->take(5) ]; #=> [1, 2, 3, 1, 2]
 
-=item join($sep)
+=item C<join($sep)>
 
 Returns string of receiver joined with $sep
 
-=item group_by(sub {})
+=item C<group_by(subh{})>
 
 Returns a hash reference group by the block.
 
@@ -301,19 +305,27 @@ Returns a hash reference group by the block.
   	'c' => [ { cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' } ],
   };
 
-=item partition(sub {})
+=item C<partition(sub {})>
 
   my ($even, $odd) = E(1..10)->partition(sub { $_ % 2 == 0 });
 
-=item include($target), is_include($target)
+=item C<include($target)>, C<is_include($target)>
 
-=item map(sub {}), collect(sub {})
+  If receiver include $target this return true.
 
-=item each(sub {})
+=item C<map(sub {})>, C<collect(sub {})>
 
-=item each_index
+map.
 
-=item each_slice($n, sub {})
+=item C<each(sub {})>
+
+Iterate items.
+
+=item C<each_index>
+
+Iterate indexes with block.
+
+=item C<each_slice($n, sub {})>
 
   E(1)->countup->each_slice(3)->take(3)->to_a;
   
@@ -323,7 +335,7 @@ Returns a hash reference group by the block.
   	[7, 8, 9],
   ];
 
-=item each_cons($n, sub {})
+=item C<each_cons($n, sub {})>
 
   E(1)->countup->each_cons(3)->take(3)->to_a;
   
@@ -333,27 +345,29 @@ Returns a hash reference group by the block.
   	[3, 4, 5]
   ];
 
-=item to_list
+=item C<to_list>
 
 Returns expanded array or array reference.
 
   E(1)->countup->take(5)->to_list;     #=> [1, 2, 3, 4, 5]
   [ E(1)->countup->take(5)->to_list ]; #=> [1, 2, 3, 4, 5]
 
-=item to_a
+=item C<to_a>
 
 Returns expanded array reference.
 
   E(1)->countup->take(5)->to_a;     #=> [1, 2, 3, 4, 5]
   [ E(1)->countup->take(5)->to_a ]; #=> [ [1, 2, 3, 4, 5] ]
 
-=item expand
+=item C<expand>
 
 Returns new List::Enumerator::Array with expanded receiver.
 
-=item dump
+=item C<dump>
 
-=item stop
+Dump receiver.
+
+=item C<stop>
 
 Throw StopIteration exception.
 
