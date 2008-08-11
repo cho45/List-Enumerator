@@ -37,13 +37,15 @@ List::Enumerator - list construct library
   use List::Enumerator qw/E/;
 
   my $fizzbuzz =
-      E(1)->countup->zip(
-          E("", "", "Fizz")->cycle,
-          E("", "", "", "", "Buzz")->cycle
-      )->map(sub {
-          my ($n, $fizz, $buzz) = @$_;
-          $fizz . $buzz || $n;
-      });
+      E(1)->countup
+          ->zip(
+              E("", "", "Fizz")->cycle,
+              E("", "", "", "", "Buzz")->cycle
+          )
+          ->map(sub {
+              my ($n, $fizz, $buzz) = @$_;
+              $fizz . $buzz || $n;
+          });
   
   $fizzbuzz->take(20)->each(sub {
       print $_, "\n";
