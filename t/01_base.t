@@ -529,5 +529,20 @@ sub test_reverse : Test(1) {
 	is_deeply E(5, 2, 1, 3, 4)->reverse->to_a, [4, 3, 1, 2, 5];
 }
 
+sub test_choice : Test(6) {
+	my $r = [];
+
+	is E(1)->choice, 1;
+	is E(1)->sample, 1;
+
+	push @$r, E(1, 2)->choice for 0..10;
+	ok grep { $_ == 1 } @$r;
+	ok grep { $_ == 2 } @$r;
+	ok !@{[ grep { $_ != 1 and $_ != 2 } @$r ]};
+
+	push @$r, E(1..10)->choice for 0..100;
+	ok !@{[ grep { !(1 <= $_ and $_ <= 10) } @$r ]};
+}
+
 __PACKAGE__->runtests;
 

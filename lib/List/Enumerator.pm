@@ -352,6 +352,10 @@ Iterate indexes with block.
   	[3, 4, 5]
   ];
 
+=item C<choice>, C<sample>
+
+Returns one item in receiver randomly.
+
 =item C<to_list>
 
 Returns expanded array or array reference.

@@ -685,6 +685,12 @@ sub each_cons {
 	wantarray? $ret->to_list : $ret;
 }
 
+sub choice {
+	my ($self) = @_;
+	$self->[int(rand($self->length))];
+}
+*sample = \&choice;
+
 sub to_a {
 	my ($self) = @_;
 	[ $self->to_list ];
