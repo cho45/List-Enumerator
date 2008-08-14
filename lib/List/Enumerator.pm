@@ -356,6 +356,10 @@ Iterate indexes with block.
 
 Returns one item in receiver randomly.
 
+=item C<shuffle>
+
+Returns randamized array of receiver.
+
 =item C<to_list>
 
 Returns expanded array or array reference.

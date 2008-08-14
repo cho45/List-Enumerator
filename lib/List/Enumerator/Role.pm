@@ -691,6 +691,12 @@ sub choice {
 }
 *sample = \&choice;
 
+sub shuffle {
+	my ($self) = @_;
+	my @shuffled = List::Util::shuffle($self->to_list);
+	wantarray? @shuffled : List::Enumerator::Array->new(array => \@shuffled);
+}
+
 sub to_a {
 	my ($self) = @_;
 	[ $self->to_list ];

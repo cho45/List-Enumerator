@@ -544,5 +544,15 @@ sub test_choice : Test(6) {
 	ok !@{[ grep { !(1 <= $_ and $_ <= 10) } @$r ]};
 }
 
+sub test_shuffle : Test(2) {
+	my $r;
+
+	$r = [ E(1, 2, 3)->shuffle ];
+	is scalar(@$r), 3;
+
+	$r = E(1, 2, 3)->shuffle->to_a;
+	is scalar(@$r), 3;
+}
+
 __PACKAGE__->runtests;
 
