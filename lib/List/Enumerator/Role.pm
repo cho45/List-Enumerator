@@ -3,6 +3,7 @@ use Exception::Class ( "StopIteration" );
 
 use List::Util;
 use List::MoreUtils;
+
 use base qw/Class::Accessor::Fast/;
 no warnings 'once';
 
@@ -166,7 +167,7 @@ sub minmax_by {
 
 sub sort_by {
 	my ($self, $block) = @_;
-	List::Enumerator::E([
+	List::Enumerator::Array->new(array => [
 		map {
 			$_->[0];
 		}
