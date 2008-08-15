@@ -1,6 +1,9 @@
 Revision history for Perl extension List::Enumerator
 
-0.04 Sun Aug 10 
+0.05 Sat Aug 16 00:06:00 2008
+	* New method: choice, sample, shuffle, transpose
+
+0.04 Sun Aug 10 16:40:00 2008
 	* Use Class::Accessor::Fast instead of Moose.
 	* List::Enumerator::Role is just a class now.
 	* E is exported by default.
