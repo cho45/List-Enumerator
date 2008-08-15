@@ -358,7 +358,7 @@ Returns one item in receiver randomly.
 
 =item C<shuffle>
 
-Returns randamized array of receiver.
+Returns randomized array of receiver.
 
 =item C<transpose>
 
