@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw/Test::Class/;
 use Test::More;
+use Test::Exception;
 
 use lib "lib";
 use List::Enumerator qw/E/;
@@ -552,6 +553,23 @@ sub test_shuffle : Test(2) {
 
 	$r = E(1, 2, 3)->shuffle->to_a;
 	is scalar(@$r), 3;
+}
+
+sub test_transpose : Test(3) {
+	is_deeply [ E([])->transpose ], [];
+
+	is_deeply [ E([
+		[1, 2],
+		[3, 4],
+		[5, 6],
+	])->transpose ], [
+		[1, 3, 5],
+		[2, 4, 6],
+	];
+
+	throws_ok {
+		E([1, 2])->transpose;
+	} qr/not a matrix/;
 }
 
 __PACKAGE__->runtests;

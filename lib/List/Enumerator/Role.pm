@@ -697,6 +697,18 @@ sub shuffle {
 	wantarray? @shuffled : List::Enumerator::Array->new(array => \@shuffled);
 }
 
+sub transpose {
+	my ($self) = @_;
+	my ($first, @rest) = $self->to_list;
+
+	if (defined $first) {
+		die "not a matrix" unless ref($first) eq "ARRAY";
+		List::Enumerator::Array->new(array => $first)->zip(@rest);
+	} else {
+		List::Enumerator::Array->new(array => [])->to_list;
+	}
+}
+
 sub to_a {
 	my ($self) = @_;
 	[ $self->to_list ];
