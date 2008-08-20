@@ -1,5 +1,8 @@
 Revision history for Perl extension List::Enumerator
 
+0.06 Wed Aug 20 09:06:00 2008
+	* Just add Class::Accessor::Fast dependency.
+
 0.05 Sat Aug 16 00:06:00 2008
 	* New method: choice, sample, shuffle, transpose
 
