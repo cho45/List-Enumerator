@@ -1,4 +1,11 @@
+use strict;
+use Test::More;
 use Test::Dependencies
-	exclude => [qw/Test::Dependencies Test::Base Test::Perl::Critic Class::Accessor::Fast List::Enumerator/],
+	exclude => [qw/ List::Enumerator /],
 	style   => 'light';
-ok_dependencies();
+
+SKIP: {
+	skip "CHECK_DEPENDENCY is off." unless $ENV{CHECK_DEPENDENCY};
+	ok_dependencies();
+};
+
