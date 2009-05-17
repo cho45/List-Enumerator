@@ -125,16 +125,26 @@ sub find {
 }
 
 sub first {
-	my ($self) = @_;
-	$self->rewind;
-	my $ret = $self->next;
-	$self->rewind;
+	my ($self, $n) = @_;
+	my $ret;
+	if (defined $n) {
+		$ret = [ $self->take($n) ];
+	} else {
+		$self->rewind;
+		$ret = $self->next;
+		$self->rewind;
+	}
 	$ret;
 }
 
 sub last {
-	my ($self) = @_;
-	$self->to_a->[-1];
+	my ($self, $n) = @_;
+	my $ret;
+	if (defined $n) {
+		$ret = [ @{ $self->to_a }[-$n..-1] ];
+	} else {
+		$ret = $self->to_a->[-1];
+	}
 }
 
 sub max {

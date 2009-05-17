@@ -132,7 +132,9 @@ sub test_countup : Test(14) {
 	is $countup->rewind->next, 2;
 }
 
-sub test_take : Test(5) {
+sub test_take : Test(6) {
+	is_deeply E(1, 2, 3, 4, 5)->take(0)->to_a, [];
+
 	is_deeply E(1, 2, 3, 4, 5)->take(3)->to_a, [1, 2, 3];
 
 	is_deeply [ E(1, 2, 3)->cycle->take(5) ], [1, 2, 3, 1, 2];
@@ -570,6 +572,20 @@ sub test_transpose : Test(3) {
 	throws_ok {
 		E([1, 2])->transpose;
 	} qr/not a matrix/;
+}
+
+sub test_first_and_last : Test(8) {
+	my $list = E(1..9);
+
+	is_deeply $list->first(0), [];
+	is_deeply $list->first(1), [qw/1/];
+	is_deeply $list->first(2), [qw/1 2/];
+	is_deeply $list->first(3), [qw/1 2 3/];
+
+	is_deeply $list->last(0), [];
+	is_deeply $list->last(1), [qw/9/];
+	is_deeply $list->last(2), [qw/8 9/];
+	is_deeply $list->last(3), [qw/7 8 9/];
 }
 
 __PACKAGE__->runtests;
