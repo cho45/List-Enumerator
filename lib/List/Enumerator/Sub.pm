@@ -1,7 +1,8 @@
 package List::Enumerator::Sub;
 use base qw/List::Enumerator::Role/;
 use overload
-	'@{}' => \&getarray;
+	'@{}' => \&getarray,
+	fallback => 1;
 
 __PACKAGE__->mk_accessors(qw/next_sub rewind_sub/);
 

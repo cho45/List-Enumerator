@@ -305,15 +305,15 @@ sub test_performance : Test(9) {
 
 sub test_group_by : Test {
 	is_deeply E([
-		{ cat => 'a' }, { cat => 'a' },{ cat => 'a' },{ cat => 'a' },
-		{ cat => 'b' }, { cat => 'b' },{ cat => 'b' },{ cat => 'b' },
-		{ cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' },
+		{ cat => 'a', n => 0 }, { cat => 'a', n => 1 },{ cat => 'a', n => 2 },{ cat => 'a', n => 3 },
+		{ cat => 'b', n => 0 }, { cat => 'b', n => 1 },{ cat => 'b', n => 2 },{ cat => 'b', n => 3 },
+		{ cat => 'c', n => 0 }, { cat => 'c', n => 1 },{ cat => 'c', n => 2 },{ cat => 'c', n => 3 },
 	])->group_by(sub {
 		$_->{cat};
 	}), {
-		'a' => [ { cat => 'a' }, { cat => 'a' },{ cat => 'a' },{ cat => 'a' } ],
-		'b' => [ { cat => 'b' }, { cat => 'b' },{ cat => 'b' },{ cat => 'b' } ],
-		'c' => [ { cat => 'c' }, { cat => 'c' },{ cat => 'c' },{ cat => 'c' } ],
+		'a' => [ { cat => 'a', n => 0 }, { cat => 'a', n => 1 },{ cat => 'a', n => 2 },{ cat => 'a', n => 3 } ],
+		'b' => [ { cat => 'b', n => 0 }, { cat => 'b', n => 1 },{ cat => 'b', n => 2 },{ cat => 'b', n => 3 } ],
+		'c' => [ { cat => 'c', n => 0 }, { cat => 'c', n => 1 },{ cat => 'c', n => 2 },{ cat => 'c', n => 3 } ],
 	};
 }
 
