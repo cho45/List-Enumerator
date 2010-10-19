@@ -7,6 +7,7 @@ requires 'List::MoreUtils';
 requires 'Exception::Class';
 requires 'Sub::Exporter';
 requires 'Class::Accessor::Fast';
+requires 'Class::ISA';
 
 test_requires 'Test::More';
 test_requires 'Test::Class';
