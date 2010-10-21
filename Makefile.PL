@@ -8,6 +8,7 @@ requires 'Exception::Class';
 requires 'Sub::Exporter';
 requires 'Class::Accessor::Fast';
 requires 'Class::ISA';
+requires 'Devel::Symdump';
 
 test_requires 'Test::More';
 test_requires 'Test::Class';

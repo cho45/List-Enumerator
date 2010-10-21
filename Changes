@@ -1,5 +1,8 @@
 Revision history for Perl extension List::Enumerator
 
+0.09 Thu Oct 21 09:35:00 2010
+	* Fix dependency.
+
 0.08 Tue Oct 19 04:35:00 2010
 	* Fix dependency.
 
