@@ -1,4 +1,7 @@
 package List::Enumerator::Role;
+use strict;
+use warnings;
+
 use Exception::Class ( "StopIteration" );
 
 use List::Util;

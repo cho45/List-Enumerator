@@ -1,4 +1,7 @@
 package List::Enumerator;
+use strict;
+use warnings;
+
 use Sub::Exporter -setup => {
 	exports => [ "E" ],
 	groups  => {

@@ -1,4 +1,7 @@
 package List::Enumerator::Array;
+use strict;
+use warnings;
+
 use base qw/List::Enumerator::Role/;
 use overload
 	'<<'  => \&push,
