@@ -12,7 +12,7 @@ use Sub::Exporter -setup => {
 use List::Enumerator::Array;
 use List::Enumerator::Sub;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 sub E {
 	my (@args) = @_;
